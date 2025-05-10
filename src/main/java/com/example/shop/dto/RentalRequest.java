@@ -8,7 +8,7 @@ public class RentalRequest {
     public Long getCustomerId() {
         return customerId;
     }
-    public void setUserId(Long customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
     public Long getSurfboardId() {

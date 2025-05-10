@@ -1,6 +1,7 @@
 package com.example.shop.controller;
 
 import com.example.shop.dto.RentalRequest;
+import com.example.shop.dto.RentalResponseDTO;
 import com.example.shop.model.Rental;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.service.RentalService;
@@ -36,14 +37,14 @@ public class RentalController {
 
     // List all rentals
     @GetMapping("/all")
-    public List<Rental> getAllRentals() {
-        return rentalRepository.findAll();
+    public List<RentalResponseDTO> getAllRentals() {
+        return rentalService.getAllRentalDTOs();
     }
 
-    // Filter by userId
-    @GetMapping("/user/{userId}")
-    public List<Rental> getRentalsByUser(@PathVariable Long userId) {
-        return rentalRepository.findByUserId(userId);
+    // Filter by customerId
+    @GetMapping("/customer/{customerId}")
+    public List<Rental> getRentalsByUser(@PathVariable Long customerId) {
+        return rentalRepository.findByCustomerId(customerId);
     }
 
     // Filter by status (e.g., REQUESTED, RENTED, RETURNED)

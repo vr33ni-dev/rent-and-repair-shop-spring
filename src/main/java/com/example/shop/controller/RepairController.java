@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.shop.dto.RentalResponseDTO;
 import com.example.shop.dto.RepairRequest;
+import com.example.shop.dto.RepairResponseDTO;
 import com.example.shop.model.Repair;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.service.RepairService;
@@ -31,13 +33,15 @@ public class RepairController {
         repairService.createRepair(request);
         return "Repair created!";
     }
+
     @GetMapping("/all")
-    public List<Repair> getAllRepairs() {
-        return repairRepository.findAll();
+    public List<RepairResponseDTO> getAllRepairs() {
+        return repairService.getAllRepairs();
     }
-    @GetMapping("/user/{userId}")
-    public List<Repair> getRepairsByUser(@PathVariable Long userId) {
-        return repairRepository.findByUserId(userId);
+
+    @GetMapping("/customer/{customerId}")
+    public List<Repair> getRepairsByUser(@PathVariable Long customerId) {
+        return repairRepository.findByCustomerId(customerId);
     }
 
     @PostMapping("/{repairId}/complete")

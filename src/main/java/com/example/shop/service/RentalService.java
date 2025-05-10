@@ -3,12 +3,12 @@ package com.example.shop.service;
 import com.example.shop.dto.RentalMessage;
 import com.example.shop.dto.RepairMessage;
 import com.example.shop.dto.RentalRequest;
+import com.example.shop.dto.RentalResponseDTO;
 import com.example.shop.model.Customer;
 import com.example.shop.model.Rental;
 import com.example.shop.model.Surfboard;
 import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
-import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -16,6 +16,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -36,6 +37,31 @@ public class RentalService {
         this.customerRepository = customerRepository;
     }
 
+    public List<RentalResponseDTO> getAllRentalDTOs() {
+        return rentalRepository.findAll().stream().map(rental -> {
+            Surfboard board = surfboardRepository.findById(rental.getSurfboardId())
+                    .orElse(null);
+
+            String boardName = board != null ? board.getName() : "Unknown";
+
+            String customerName = "Shop";
+            if (rental.getCustomerId() != null) {
+                customerName = customerRepository.findById(rental.getCustomerId())
+                        .map(Customer::getName)
+                        .orElse("Unknown Customer");
+            }      
+
+            return new RentalResponseDTO(
+                    rental.getId(),
+                    rental.getSurfboardId(),
+                    boardName,
+                    customerName,
+                    rental.getRentedAt(),
+                    rental.getReturnedAt(),
+                    rental.getStatus());
+        }).toList();
+    }
+
     public void rentBoard(RentalRequest request) {
         // Ensure the customer exists or create a placeholder
         customerRepository.findById(request.getCustomerId())
@@ -54,7 +80,7 @@ public class RentalService {
 
         if (board.isAvailableForRental()) {
             Rental rental = new Rental();
-            rental.setUserId(request.getCustomerId());
+            rental.setCustomerId(request.getCustomerId());
             rental.setSurfboardId(request.getSurfboardId());
             rental.setRentedAt(LocalDateTime.now());
             rental.setStatus("CREATED");
@@ -63,7 +89,7 @@ public class RentalService {
             rabbitTemplate.convertAndSend("surfboard.exchange", "rental.created", new RentalMessage(
                     savedRental.getId(),
                     savedRental.getSurfboardId(),
-                    savedRental.getUserId(),
+                    savedRental.getCustomerId(),
                     false // not damaged at this point
             ));
             System.out.println("✅ Rental created for surfboard ID: " + board.getId());
@@ -91,7 +117,7 @@ public class RentalService {
             surfboardRepository.save(board);
 
             // Send repair message
-            RepairMessage repairMsg = new RepairMessage(board.getId(), "Ding on the tail", rental.getUserId());
+            RepairMessage repairMsg = new RepairMessage(board.getId(), "Ding on the tail", rental.getCustomerId());
             rabbitTemplate.convertAndSend("surfboard.exchange", "repair.created", repairMsg);
             System.out.println("🛠️ Sent repair.created for board ID: " + board.getId());
         } else {
@@ -105,13 +131,13 @@ public class RentalService {
 
         // Emit rental.completed message
         RentalMessage rentalMessage = new RentalMessage(savedRental.getId(), savedRental.getSurfboardId(),
-                savedRental.getUserId(), isDamaged);
+                savedRental.getCustomerId(), isDamaged);
         rabbitTemplate.convertAndSend("surfboard.exchange", "rental.completed", rentalMessage);
 
         // Randomly decide if a repair is needed
         if (isDamaged) {
             RepairMessage repairMsg = new RepairMessage(savedRental.getSurfboardId(), "Ding on the tail",
-                    savedRental.getUserId());
+                    savedRental.getCustomerId());
             rabbitTemplate.convertAndSend("surfboard.exchange", "repair.created", repairMsg);
         }
         System.out.println("✅ Rental completed for rental ID: " + rentalId);

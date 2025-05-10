@@ -36,7 +36,7 @@ public class RentalMessage   {
         return customerId;
     }
 
-    public void setUserId(Long customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 

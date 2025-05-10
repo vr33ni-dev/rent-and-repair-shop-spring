@@ -11,7 +11,7 @@ public class Bill {
     private Long id;
 
     private Long surfboardId;
-    private Long userId;
+    private Long customerId;
     private double amount;
     private String description;
     private LocalDateTime createdAt;
@@ -28,11 +28,11 @@ public class Bill {
     public void setSurfboardId(Long surfboardId) {
         this.surfboardId = surfboardId;
     }
-    public Long getUserId() {
-        return userId;
+    public Long getCustomerId() {
+        return customerId;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
     public double getAmount() {
         return amount;
