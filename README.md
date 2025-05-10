@@ -106,6 +106,18 @@ The application uses PostgreSQL. Update the database connection details in src/m
 
 ### API Endpoints
 
+#### Billings `/api/bills`
+
+- `   GET /all`
+
+    List all bills
+- `   GET /user/{userId}`
+
+    List bills by user
+- `   GET /board/{surfboardId}`
+
+    List bills by surfboard
+    
 #### Rentals `/api/rentals`
 
 - `   POST /`

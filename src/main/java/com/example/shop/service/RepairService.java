@@ -9,7 +9,7 @@ import com.example.shop.repository.SurfboardRepository;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
- import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;
 
 @Service
 public class RepairService {
@@ -31,6 +31,7 @@ public class RepairService {
         repair.setIssue(request.getIssue());
         repair.setStatus("CREATED");
         repairRepository.save(repair);
+        System.out.println("Manual repair created with ID: " + repair.getId());
     }
 
     public void markRepairAsCompleted(Long repairId) {
@@ -54,25 +55,23 @@ public class RepairService {
         RepairMessage message = new RepairMessage(repair.getSurfboardId(), repair.getIssue());
         rabbitTemplate.convertAndSend("surfboard.exchange", "repair.completed", message);
 
-        System.out.println("✅ Repair completed and board updated for board ID: " + board.getId());
+        System.out.println("Repair completed and board updated for board ID: " + board.getId());
     }
-
 
     public void cancelRepair(Long repairId) {
         Repair repair = repairRepository.findById(repairId)
                 .orElseThrow(() -> new IllegalArgumentException("Repair not found with ID: " + repairId));
-    
+
         if ("COMPLETED".equalsIgnoreCase(repair.getStatus())) {
             throw new IllegalStateException("Cannot cancel a completed repair.");
         }
-    
+
         repair.setStatus("CANCELED");
         repairRepository.save(repair);
-    
+
         System.out.println("Repair canceled: ID " + repairId);
     }
 
-    
     @RabbitListener(queues = "repair.queue")
     public void processRepair(RepairMessage message) {
         System.out.println("Repair requested for board ID: " + message.getSurfboardId());
@@ -80,8 +79,8 @@ public class RepairService {
         repair.setSurfboardId(message.getSurfboardId());
         repair.setIssue(message.getIssue());
         repair.setStatus("CREATED");
-        // Save repair to DB (repository not shown here)
+        repairRepository.save(repair);
+        System.out.println("Automatic repair created with ID: " + repair.getId());
     }
-
 
 }
