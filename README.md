@@ -111,9 +111,9 @@ The application uses PostgreSQL. Update the database connection details in src/m
 - `   GET /all`
 
     List all bills
-- `   GET /user/{userId}`
+- `   GET /customer/{customerId}`
 
-    List bills by user
+    List bills by customer
 - `   GET /board/{surfboardId}`
 
     List bills by surfboard
@@ -129,9 +129,9 @@ The application uses PostgreSQL. Update the database connection details in src/m
 - `   GET /all`
 
     List all rentals
-- `   GET /user/{userId}`
+- `   GET /user/{customerId}`
 
-    Filter by userId
+    Filter by customerId
 - `   GET /status/{status}`
 
     Filter by status (e.g., REQUESTED, RENTED, RETURNED)
@@ -140,7 +140,7 @@ The application uses PostgreSQL. Update the database connection details in src/m
 
 - `   POST /`
 - `   GET /all`
-- `   GET /user/{userId}`
+- `   GET /customer/{customerId}`
 - `   POST /{repairId}/complete`
 - `   POST /{repairId}/cancel`
 

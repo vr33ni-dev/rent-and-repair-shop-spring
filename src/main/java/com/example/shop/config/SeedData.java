@@ -56,32 +56,38 @@ public class SeedData {
 
             // Rentals
             Rental rental1 = new Rental();
+            Customer customer3 = customerRepo.save(new Customer("Kook1", "kook@example.com"));
+
             rental1.setSurfboardId(shopBoard3.getId());
-            rental1.setUserId(42L);
+            rental1.setCustomerId(customer3.getId());
             rental1.setRentedAt(LocalDateTime.now().minusDays(1));
             rental1.setStatus("RENTED");
             rentalRepo.save(rental1);
     
             // Repairs
             Repair repair1 = new Repair();
+            Customer customer4 = customerRepo.save(new Customer("Kook2", "kook@example.com"));
             repair1.setSurfboardId(shopBoard2.getId());
-            repair1.setUserId(99L);
+            repair1.setCustomerId(customer4.getId());
             repair1.setIssue("Cracked fin");
             repair1.setStatus("IN_PROGRESS");
+            repair1.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair1);
     
             Repair repair2 = new Repair();
             repair2.setSurfboardId(userBoard1.getId()); // it's not in shop inventory
-            repair2.setUserId(101L);
+            repair2.setCustomerId(customer1.getId());
             repair2.setIssue("Tail damage");
             repair2.setStatus("CREATED");
+            repair2.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair2);
     
             Repair repair3 = new Repair();
             repair3.setSurfboardId(userBoard2.getId()); // it's not in shop inventory
-            repair3.setUserId(101L);
+            repair3.setCustomerId(customer2.getId());
             repair3.setIssue("Tail damage");
             repair3.setStatus("CREATED");
+            repair3.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair3);
     
             System.out.println("🌱 Seed data loaded successfully");

@@ -2,12 +2,16 @@ package com.example.shop.service;
 
 import com.example.shop.dto.RepairMessage;
 import com.example.shop.dto.RepairRequest;
+import com.example.shop.dto.RepairResponseDTO;
 import com.example.shop.model.Customer;
 import com.example.shop.model.Repair;
 import com.example.shop.model.Surfboard;
 import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,6 +32,34 @@ public class RepairService {
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
         this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public List<RepairResponseDTO> getAllRepairs() {
+        List<Repair> repairs = repairRepository.findAll();
+
+        return repairs.stream().map(repair -> {
+            Surfboard board = surfboardRepository.findById(repair.getSurfboardId())
+                    .orElseThrow(
+                            () -> new IllegalStateException("Surfboard not found for repair ID: " + repair.getId()));
+
+            String boardName = board.getName();
+            String customerName = "Shop";
+
+            if (repair.getCustomerId() != null) {
+                customerName = customerRepository.findById(repair.getCustomerId())
+                        .map(Customer::getName)
+                        .orElse("Unknown Customer");
+            }
+
+            return new RepairResponseDTO(
+                    repair.getId(),
+                    board.getId(),
+                    boardName,
+                    repair.getIssue(),
+                    repair.getStatus(),
+                    repair.getCreatedAt(),
+                    customerName);
+        }).collect(Collectors.toList());
     }
 
     public void createRepair(RepairRequest request) {
@@ -78,8 +110,9 @@ public class RepairService {
             }
         });
 
-        // Emit repair.completed message (userId optional in RepairMessage if tracked)
-        RepairMessage msg = new RepairMessage(repair.getSurfboardId(), repair.getIssue(), repair.getUserId());
+        // Emit repair.completed message (customerId optional in RepairMessage if
+        // tracked)
+        RepairMessage msg = new RepairMessage(repair.getSurfboardId(), repair.getIssue(), repair.getCustomerId());
         rabbitTemplate.convertAndSend("surfboard.exchange", "repair.completed", msg);
         System.out.println("Repair.completed sent for board ID: " + repair.getSurfboardId());
     }
@@ -130,7 +163,7 @@ public class RepairService {
         repair.setSurfboardId(message.getSurfboardId());
         repair.setIssue(message.getIssue());
         repair.setStatus("CREATED");
-        repair.setUserId(message.getCustomerId());
+        repair.setCustomerId(message.getCustomerId());
         repairRepository.save(repair);
         System.out.println("Automatic repair created with ID: " + repair.getId());
     }
