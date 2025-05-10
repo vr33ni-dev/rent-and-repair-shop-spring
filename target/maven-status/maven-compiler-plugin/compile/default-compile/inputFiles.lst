@@ -1,0 +1,17 @@
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/model/Repair.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/dto/RentalRequest.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/dto/RentalMessage.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/controller/RentalController.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/model/Surfboard.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/controller/RepairController.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/config/SeedData.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/model/Rental.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/dto/RepairRequest.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/repository/SurfboardRepository.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/controller/SurfboardController.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/RentAndAndRepairShopApplication.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/repository/RentalRepository.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/service/RentalService.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/repository/RepairRepository.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/service/RepairService.java
+/Users/vreeni/Dev/MacDev/rent-and-repair-shop/src/main/java/com/example/shop/dto/RepairMessage.java

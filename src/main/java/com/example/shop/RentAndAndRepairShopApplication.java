@@ -1,0 +1,21 @@
+package com.example.shop;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.Environment;
+
+@SpringBootApplication
+public class RentAndAndRepairShopApplication {
+
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(RentAndAndRepairShopApplication.class);
+        Environment env = app.run(args).getEnvironment();
+        
+        System.out.println("🧪 Loaded config:");
+        System.out.println("🔍 JDBC URL: " + env.getProperty("spring.datasource.url"));
+        System.out.println("🔍 Username: " + env.getProperty("spring.datasource.username"));
+        System.out.println("🔍 Password: " + env.getProperty("spring.datasource.password"));
+    }
+    
+
+}
