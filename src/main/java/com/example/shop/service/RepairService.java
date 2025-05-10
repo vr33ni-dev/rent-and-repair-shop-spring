@@ -26,6 +26,17 @@ public class RepairService {
     }
 
     public void createRepair(RepairRequest request) {
+        Long boardId = request.getSurfboardId();
+
+        boolean repairExists = repairRepository
+        .findBySurfboardIdAndStatusNot(boardId, "COMPLETED")
+        .stream()
+        .anyMatch(r -> !"CANCELED".equalsIgnoreCase(r.getStatus()));
+
+    if (repairExists) {
+        System.out.println("⚠️ Repair already exists for surfboard ID: " + boardId + ", skipping.");
+        return;
+    }
         Repair repair = new Repair();
         repair.setSurfboardId(request.getSurfboardId());
         repair.setIssue(request.getIssue());
@@ -52,7 +63,7 @@ public class RepairService {
 
         // Emit repair.completed message (optional, but useful for
         // billing/notifications)
-        RepairMessage message = new RepairMessage(repair.getSurfboardId(), repair.getIssue());
+        RepairMessage message = new RepairMessage(repair.getSurfboardId(), repair.getIssue(), repair.getUserId());
         rabbitTemplate.convertAndSend("surfboard.exchange", "repair.completed", message);
 
         System.out.println("Repair completed and board updated for board ID: " + board.getId());
@@ -74,6 +85,17 @@ public class RepairService {
 
     @RabbitListener(queues = "repair.queue")
     public void processRepair(RepairMessage message) {
+        Long boardId = message.getSurfboardId();
+
+        boolean repairExists = repairRepository
+            .findBySurfboardIdAndStatusNot(boardId, "COMPLETED")
+            .stream()
+            .anyMatch(r -> !"CANCELED".equalsIgnoreCase(r.getStatus()));
+    
+        if (repairExists) {
+            System.out.println("⚠️ Repair already exists for surfboard ID: " + boardId + ", skipping.");
+            return;
+        }
         System.out.println("Repair requested for board ID: " + message.getSurfboardId());
         Repair repair = new Repair();
         repair.setSurfboardId(message.getSurfboardId());

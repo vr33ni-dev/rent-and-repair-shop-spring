@@ -16,7 +16,7 @@ public class InventoryService {
         this.surfboardRepository = surfboardRepository;
     }
 
-    @RabbitListener(queues = "rental.returned.queue")
+    @RabbitListener(queues = "rental.completed.queue")
     public void handleRentalReturned(RentalMessage message) {
         Surfboard board = surfboardRepository.findById(message.getSurfboardId())
                 .orElseThrow(() -> new IllegalArgumentException("Surfboard not found"));
@@ -24,7 +24,6 @@ public class InventoryService {
         board.setAvailable(true);
         if (message.isDamaged()) {
             board.setDamaged(true);
-            board.setAvailable(false); // not rentable if damaged
         }
         surfboardRepository.save(board);
 
@@ -33,13 +32,24 @@ public class InventoryService {
 
     @RabbitListener(queues = "repair.completed.queue")
     public void handleRepairCompleted(RepairMessage message) {
+        if (message.getSurfboardId() == null) {
+            System.out.println("⚠️ Repair completed for user-owned board (not in inventory): " + message.getUserId());
+            return;
+        }
+        // Fetch the surfboard from the repository
         Surfboard board = surfboardRepository.findById(message.getSurfboardId())
                 .orElseThrow(() -> new IllegalArgumentException("Surfboard not found"));
 
-        board.setDamaged(false);
-        board.setAvailable(true);
-        surfboardRepository.save(board);
-
-        System.out.println("🛠️ Repair completed, board available: " + board.getId());
+        // Only update availability for shop-owned boards
+        if (board.getOwnerUserId() == null) {
+            board.setDamaged(false);
+            board.setAvailable(true);
+            surfboardRepository.save(board);
+            System.out.println("🛠️ Repair completed, board available: " + board.getId());
+        } else {
+            // User-owned board: only log, no persistence
+            System.out
+                    .println("🛠️ Repair completed for user-owned board (not updated in inventory): " + board.getId());
+        }
     }
 }

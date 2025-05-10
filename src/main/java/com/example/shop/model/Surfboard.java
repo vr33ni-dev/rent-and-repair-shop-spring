@@ -47,6 +47,10 @@ public class Surfboard {
     public void setAvailable(boolean available) {
         this.available = available;
     }
+    public boolean isAvailableForRental() {
+        return this.ownerUserId == null && this.available && !this.damaged;
+    }
+    
     public boolean isDamaged() {
         return damaged;
     }

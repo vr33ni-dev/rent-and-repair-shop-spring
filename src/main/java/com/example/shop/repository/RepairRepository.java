@@ -10,6 +10,6 @@ public interface RepairRepository extends JpaRepository<Repair, Long> {
 
     List<Repair> findBySurfboardId(Long surfboardId);
     List<Repair> findByUserId(Long userId);
+    List<Repair> findBySurfboardIdAndStatusNot(Long surfboardId, String status);
 
- 
 }

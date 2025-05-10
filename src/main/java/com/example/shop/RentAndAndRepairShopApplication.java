@@ -13,8 +13,6 @@ public class RentAndAndRepairShopApplication {
         
         System.out.println("🧪 Loaded config:");
         System.out.println("🔍 JDBC URL: " + env.getProperty("spring.datasource.url"));
-        System.out.println("🔍 Username: " + env.getProperty("spring.datasource.username"));
-        System.out.println("🔍 Password: " + env.getProperty("spring.datasource.password"));
     }
     
 
