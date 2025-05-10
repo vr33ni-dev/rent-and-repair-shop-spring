@@ -1,15 +1,15 @@
 package com.example.shop.dto;
 
 public class RentalRequest {
-    private Long userId;
+    private Long customerId;
     private Long surfboardId;
 
 
-    public Long getUserId() {
-        return userId;
+    public Long getCustomerId() {
+        return customerId;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserId(Long customerId) {
+        this.customerId = customerId;
     }
     public Long getSurfboardId() {
         return surfboardId;

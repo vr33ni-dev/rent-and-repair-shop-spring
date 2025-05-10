@@ -22,7 +22,7 @@ public class BillingService {
     public void handleRepairCompleted(RepairMessage msg) {
         Bill bill = new Bill();
         bill.setSurfboardId(msg.getSurfboardId());
-        bill.setUserId(null); // Optional: if RepairMessage includes userId, set it here
+        bill.setUserId(msg.getCustomerId());  
         bill.setAmount(49.99);
         bill.setDescription("Repair: " + msg.getIssue());
         bill.setCreatedAt(LocalDateTime.now());
@@ -35,12 +35,12 @@ public class BillingService {
     public void handleRentalCompleted(RentalMessage msg) {
         Bill bill = new Bill();
         bill.setSurfboardId(msg.getSurfboardId());
-        bill.setUserId(msg.getUserId());
+        bill.setUserId(msg.getCustomerId());
         bill.setAmount(19.99); // flat-rate or calculate based on duration if desired
         bill.setDescription("Rental fee");
         bill.setCreatedAt(LocalDateTime.now());
 
         billRepository.save(bill);
-        System.out.println("💸 Bill generated for rental by user ID: " + msg.getUserId());
+        System.out.println("💸 Bill generated for rental by user ID: " + msg.getCustomerId());
     }
 }

@@ -3,14 +3,14 @@ package com.example.shop.dto;
 public class RepairMessage {
     private Long surfboardId;
     private String issue;
-    private Long userId; // Optional: null if shop-owned
+    private Long customerId; 
 
     public RepairMessage() {}
 
-    public RepairMessage(Long surfboardId, String issue, Long userId) {
+    public RepairMessage(Long surfboardId, String issue, Long customerId) {
         this.surfboardId = surfboardId;
         this.issue = issue;
-        this.userId = userId;
+        this.customerId = customerId;
     }
 
     public Long getSurfboardId() {
@@ -29,11 +29,11 @@ public class RepairMessage {
         this.issue = issue;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserId(Long customerId) {
+        this.customerId = customerId;
     }
 }

@@ -4,15 +4,15 @@ package com.example.shop.dto;
 public class RentalMessage   {
     private Long rentalId;
     private Long surfboardId;
-    private Long userId;
+    private Long customerId;
     private boolean damaged;
 
     public RentalMessage() {}         // Required for JSON deserialization
 
-    public RentalMessage(Long rentalId, Long surfboardId, Long userId, boolean damaged) {
+    public RentalMessage(Long rentalId, Long surfboardId, Long customerId, boolean damaged) {
         this.rentalId = rentalId;
         this.surfboardId = surfboardId;
-        this.userId = userId;
+        this.customerId = customerId;
         this.damaged = damaged;
     }
 
@@ -32,12 +32,12 @@ public class RentalMessage   {
         this.surfboardId = surfboardId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUserId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public boolean isDamaged() {

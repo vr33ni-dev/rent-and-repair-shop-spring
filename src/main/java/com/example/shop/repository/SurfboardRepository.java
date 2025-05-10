@@ -10,8 +10,7 @@ import java.util.List;
 public interface SurfboardRepository extends JpaRepository<Surfboard, Long> {
 
     List<Surfboard> findByShopOwnedTrue(); // All rentable boards
-
-    List<Surfboard> findByOwnerUserId(Long userId); // Boards brought in by customers
-
+    List<Surfboard> findByAvailableTrue(); // All available boards
+    List<Surfboard> findByAvailableTrueAndShopOwnedTrue(); // Rentable and available boards
     List<Surfboard> findByDamagedTrue(); // Boards needing or under repair
 }

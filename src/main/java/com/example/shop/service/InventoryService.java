@@ -33,7 +33,7 @@ public class InventoryService {
     @RabbitListener(queues = "repair.completed.queue")
     public void handleRepairCompleted(RepairMessage message) {
         if (message.getSurfboardId() == null) {
-            System.out.println("⚠️ Repair completed for user-owned board (not in inventory): " + message.getUserId());
+            System.out.println("⚠️ Repair completed for user-owned board (not in inventory): " + message.getCustomerId());
             return;
         }
         // Fetch the surfboard from the repository
@@ -41,7 +41,7 @@ public class InventoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Surfboard not found"));
 
         // Only update availability for shop-owned boards
-        if (board.getOwnerUserId() == null) {
+        if (board.isShopOwned() == true) {
             board.setDamaged(false);
             board.setAvailable(true);
             surfboardRepository.save(board);
