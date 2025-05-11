@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -63,39 +64,54 @@ public class RentalService {
     }
 
     public void rentBoard(RentalRequest request) {
-        // Ensure the customer exists or create a placeholder
-        customerRepository.findById(request.getCustomerId())
-                .orElseGet(() -> {
-                    Customer newCustomer = new Customer();
-                    newCustomer.setId(request.getCustomerId());
-                    newCustomer.setName("Customer " + request.getCustomerId());
-                    return customerRepository.save(newCustomer);
-                });
+        String name = request.getCustomerName();
+        String contact = request.getCustomerContact();
+    
+        // Determine if it's an email or phone
+        boolean isEmail = contact.contains("@");
+    
+        // Look up existing customer
+        Optional<Customer> customerOpt = isEmail
+            ? customerRepository.findByEmail(contact)
+            : customerRepository.findByPhone(contact);
+    
+        Customer customer = customerOpt.orElseGet(() -> {
+            Customer newCustomer = new Customer();
+            newCustomer.setName(name);
+            if (isEmail) {
+                newCustomer.setEmail(contact);
+            } else {
+                newCustomer.setPhone(contact);
+            }
+            return customerRepository.save(newCustomer);
+        });
+    
+        // Validate board
         Surfboard board = surfboardRepository.findById(request.getSurfboardId())
                 .orElseThrow(() -> new RuntimeException("Surfboard not found with ID: " + request.getSurfboardId()));
-
+    
         if (!board.isShopOwned()) {
             throw new IllegalStateException("Cannot rent a user-owned board.");
         }
-
-        if (board.isAvailableForRental()) {
-            Rental rental = new Rental();
-            rental.setCustomerId(request.getCustomerId());
-            rental.setSurfboardId(request.getSurfboardId());
-            rental.setRentedAt(LocalDateTime.now());
-            rental.setStatus("CREATED");
-            Rental savedRental = rentalRepository.save(rental);
-
-            rabbitTemplate.convertAndSend("surfboard.exchange", "rental.created", new RentalMessage(
-                    savedRental.getId(),
-                    savedRental.getSurfboardId(),
-                    savedRental.getCustomerId(),
-                    false // not damaged at this point
-            ));
-            System.out.println("✅ Rental created for surfboard ID: " + board.getId());
-        } else {
-            System.out.println("⚠️ Surfboard not available for rental: " + board.getId());
+    
+        if (!board.isAvailableForRental()) {
+            throw new IllegalStateException("Surfboard not available for rental.");
         }
+    
+        // Create rental
+        Rental rental = new Rental();
+        rental.setCustomerId(customer.getId());
+        rental.setSurfboardId(board.getId());
+        rental.setRentedAt(LocalDateTime.now());
+        rental.setStatus("CREATED");
+        Rental savedRental = rentalRepository.save(rental);
+    
+        // Emit rental.created message
+        rabbitTemplate.convertAndSend("surfboard.exchange", "rental.created", new RentalMessage(
+                savedRental.getId(), board.getId(), customer.getId(), false
+        ));
+    
+        System.out.println("✅ Rental created for surfboard ID: " + board.getId());
     }
 
     public void returnBoard(Long rentalId) {
