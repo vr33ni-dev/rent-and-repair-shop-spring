@@ -3,7 +3,8 @@ package com.example.shop.dto;
 public class RepairRequest {
     private Long surfboardId;
     private String issue;
-    private Long customerId; 
+    private String customerName;
+    private String customerContact;
 
     public Long getSurfboardId() {
         return surfboardId;
@@ -20,11 +21,21 @@ public class RepairRequest {
     public void setIssue(String issue) {
         this.issue = issue;
     }
-    public Long getCustomerId() {
-        return customerId;
+
+    public String getCustomerName() {
+        return customerName;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
+
+    public String getCustomerContact() {
+        return customerContact;
+    }
+
+    public void setCustomerContact(String customerContact) {
+        this.customerContact = customerContact;
+    }
+
 }

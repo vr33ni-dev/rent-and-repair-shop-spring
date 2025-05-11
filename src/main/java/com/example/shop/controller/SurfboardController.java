@@ -20,4 +20,13 @@ public class SurfboardController {
     public List<Surfboard> getAllSurfboards() {
         return surfboardRepository.findAll();
     }
+
+    @GetMapping("/available")
+    public List<Surfboard> getAvailableBoards() {
+        return surfboardRepository.findAll()
+                .stream()
+                .filter(Surfboard::isAvailableForRental)
+                .toList();
+    }
+
 }

@@ -11,6 +11,7 @@ import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -63,6 +64,27 @@ public class RepairService {
     }
 
     public void createRepair(RepairRequest request) {
+        String name = request.getCustomerName();
+        String contact = request.getCustomerContact();
+        // Determine if it's an email or phone
+        boolean isEmail = contact.contains("@");
+
+                // Look up existing customer
+        Optional<Customer> customerOpt = isEmail
+            ? customerRepository.findByEmail(contact)
+            : customerRepository.findByPhone(contact);
+    
+            Customer customer = customerOpt.orElseGet(() -> {
+                Customer newCustomer = new Customer();
+                newCustomer.setName(name);
+                if (isEmail) {
+                    newCustomer.setEmail(contact);
+                } else {
+                    newCustomer.setPhone(contact);
+                }
+                return customerRepository.save(newCustomer);
+            });
+
         Long boardId = request.getSurfboardId();
 
         boolean repairExists = repairRepository
@@ -74,17 +96,10 @@ public class RepairService {
             System.out.println("⚠️ Repair already exists for surfboard ID: " + boardId + ", skipping.");
             return;
         }
-        if (request.getCustomerId() != null) {
-            customerRepository.findById(request.getCustomerId())
-                    .orElseGet(() -> {
-                        Customer newCustomer = new Customer();
-                        newCustomer.setId(request.getCustomerId());
-                        newCustomer.setName("Customer " + request.getCustomerId());
-                        return customerRepository.save(newCustomer);
-                    });
-        }
+
         Repair repair = new Repair();
         repair.setSurfboardId(request.getSurfboardId());
+        repair.setCustomerId(customer.getId());
         repair.setIssue(request.getIssue());
         repair.setStatus("CREATED");
         repairRepository.save(repair);
