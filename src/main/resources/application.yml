@@ -26,3 +26,6 @@ logging:
   level:
     root: DEBUG
     org.springframework: DEBUG
+
+cors:
+  allowed-origin: ${CORS_ALLOWED_ORIGIN:*}
