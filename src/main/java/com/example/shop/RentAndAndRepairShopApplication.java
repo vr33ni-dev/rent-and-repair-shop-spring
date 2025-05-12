@@ -1,9 +1,14 @@
 package com.example.shop;
 
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.metamodel.Metamodel;
 
 @SpringBootApplication
 @EnableRabbit
@@ -17,5 +22,13 @@ public class RentAndAndRepairShopApplication {
         System.out.println("🔍 JDBC URL: " + env.getProperty("spring.datasource.url"));
     }
     
+@Bean
+public CommandLineRunner init(EntityManager entityManager) {
+    return args -> {
+        Metamodel metamodel = entityManager.getMetamodel();
+        System.out.println("Entities detected by JPA:");
+        metamodel.getEntities().forEach(e -> System.out.println(" - " + e.getName()));
+    };
+}
 
 }

@@ -1,6 +1,8 @@
 package com.example.shop.config;
 
 import com.example.shop.model.Surfboard;
+import com.example.shop.enums.RentalStatus;
+import com.example.shop.enums.RepairStatus;
 import com.example.shop.model.Customer;
 import com.example.shop.model.Rental;
 import com.example.shop.model.Repair;
@@ -9,18 +11,22 @@ import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 
-import jakarta.annotation.PostConstruct;
+ 
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
-public class SeedData {
+public class SeedData implements ApplicationListener<ContextRefreshedEvent> {
 
     private final SurfboardRepository surfboardRepo;
     private final RentalRepository rentalRepo;
     private final RepairRepository repairRepo;
     private final CustomerRepository customerRepo;
+
+    private boolean alreadySeeded = false;
 
     public SeedData(
             SurfboardRepository surfboardRepo,
@@ -33,8 +39,10 @@ public class SeedData {
         this.customerRepo = customerRepo;
     }
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (alreadySeeded) return;
+
         if (surfboardRepo.count() == 0) {
             // Shop-owned surfboards
             Surfboard shopBoard1 = new Surfboard("Longboard Classic", true, false, true, null, "/images/longboard.jpg");
@@ -61,7 +69,7 @@ public class SeedData {
             rental1.setSurfboardId(shopBoard3.getId());
             rental1.setCustomerId(customer3.getId());
             rental1.setRentedAt(LocalDateTime.now().minusDays(1));
-            rental1.setStatus("RENTED");
+            rental1.setStatus(RentalStatus.CREATED);
             rentalRepo.save(rental1);
     
             // Repairs
@@ -70,7 +78,7 @@ public class SeedData {
             repair1.setSurfboardId(shopBoard2.getId());
             repair1.setCustomerId(customer4.getId());
             repair1.setIssue("Cracked fin");
-            repair1.setStatus("IN_PROGRESS");
+            repair1.setStatus(RepairStatus.CREATED);
             repair1.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair1);
     
@@ -78,7 +86,7 @@ public class SeedData {
             repair2.setSurfboardId(userBoard1.getId()); // it's not in shop inventory
             repair2.setCustomerId(customer1.getId());
             repair2.setIssue("Tail damage");
-            repair2.setStatus("CREATED");
+            repair2.setStatus(RepairStatus.CREATED);
             repair2.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair2);
     
@@ -86,12 +94,16 @@ public class SeedData {
             repair3.setSurfboardId(userBoard2.getId()); // it's not in shop inventory
             repair3.setCustomerId(customer2.getId());
             repair3.setIssue("Tail damage");
-            repair3.setStatus("CREATED");
+            repair3.setStatus(RepairStatus.CREATED);
             repair3.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
             repairRepo.save(repair3);
     
             System.out.println("🌱 Seed data loaded successfully");
         }
-    }
+    
 
+
+        alreadySeeded = true;
+    }
 }
+ 

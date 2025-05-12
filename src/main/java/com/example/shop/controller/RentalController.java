@@ -2,6 +2,7 @@ package com.example.shop.controller;
 
 import com.example.shop.dto.RentalRequest;
 import com.example.shop.dto.RentalResponseDTO;
+import com.example.shop.enums.RentalStatus;
 import com.example.shop.model.Rental;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.service.RentalService;
@@ -49,7 +50,7 @@ public class RentalController {
 
     // Filter by status (e.g., REQUESTED, RENTED, RETURNED)
     @GetMapping("/status/{status}")
-    public List<Rental> getRentalsByStatus(@PathVariable String status) {
-        return rentalRepository.findByStatusIgnoreCase(status);
+    public List<Rental> getRentalsByStatus(@PathVariable RentalStatus status) {
+        return rentalRepository.findByStatus(status);
     }
 }

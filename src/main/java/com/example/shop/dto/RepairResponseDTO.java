@@ -2,19 +2,27 @@ package com.example.shop.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.shop.enums.RepairStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairResponseDTO {
     private Long repairId;
     private Long surfboardId;
+    private Long customerId;
+    private Long rentalId;
     private String surfboardName;
     private String customerName; // "Shop" if shop-owned
     private String issue;
-    private String status;
+    private RepairStatus status;
     private LocalDateTime createdAt;
 
-    public RepairResponseDTO(Long repairId, Long surfboardId, String surfboardName, 
-            String issue, String status, LocalDateTime createdAt, String customerName) {
+     public RepairResponseDTO(Long repairId, Long surfboardId, Long customerId, Long rentalId, String surfboardName, 
+            String issue, RepairStatus status, LocalDateTime createdAt, String customerName) {
         this.repairId = repairId;
         this.surfboardId = surfboardId;
+        this.customerId = customerId;
+        this.rentalId = rentalId;;
         this.surfboardName = surfboardName;
         this.customerName = customerName;
         this.issue = issue;
@@ -36,9 +44,21 @@ public class RepairResponseDTO {
     public void setSurfboardId(Long surfboardId) {
         this.surfboardId = surfboardId;
     }
-    public String getSurfboardIdString() {
-        return String.valueOf(surfboardId);
+
+    public Long getCustomerId() {
+        return customerId;
     }
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public Long getRentalId() {
+        return rentalId;
+    }
+    public void setRentalId(Long rentalId) {
+        this.rentalId = rentalId;
+    }
+ 
     public String getSurfboardName() {
         return surfboardName;
     }
@@ -60,10 +80,10 @@ public class RepairResponseDTO {
     public void setIssue(String issue) {
         this.issue = issue;
     }
-    public String getStatus() {
+    public RepairStatus getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(RepairStatus status) {
         this.status = status;
     }
     public LocalDateTime getCreatedAt() {

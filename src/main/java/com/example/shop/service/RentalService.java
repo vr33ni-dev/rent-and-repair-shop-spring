@@ -2,6 +2,7 @@ package com.example.shop.service;
 
 import com.example.shop.dto.RentalMessage;
 import com.example.shop.dto.RepairMessage;
+import com.example.shop.enums.RentalStatus;
 import com.example.shop.dto.RentalRequest;
 import com.example.shop.dto.RentalResponseDTO;
 import com.example.shop.model.Customer;
@@ -50,11 +51,12 @@ public class RentalService {
                 customerName = customerRepository.findById(rental.getCustomerId())
                         .map(Customer::getName)
                         .orElse("Unknown Customer");
-            }      
+            }
 
             return new RentalResponseDTO(
                     rental.getId(),
                     rental.getSurfboardId(),
+                    rental.getCustomerId(),
                     boardName,
                     customerName,
                     rental.getRentedAt(),
@@ -66,15 +68,15 @@ public class RentalService {
     public void rentBoard(RentalRequest request) {
         String name = request.getCustomerName();
         String contact = request.getCustomerContact();
-    
+
         // Determine if it's an email or phone
         boolean isEmail = contact.contains("@");
-    
+
         // Look up existing customer
         Optional<Customer> customerOpt = isEmail
-            ? customerRepository.findByEmail(contact)
-            : customerRepository.findByPhone(contact);
-    
+                ? customerRepository.findByEmail(contact)
+                : customerRepository.findByPhone(contact);
+
         Customer customer = customerOpt.orElseGet(() -> {
             Customer newCustomer = new Customer();
             newCustomer.setName(name);
@@ -85,83 +87,79 @@ public class RentalService {
             }
             return customerRepository.save(newCustomer);
         });
-    
+
         // Validate board
         Surfboard board = surfboardRepository.findById(request.getSurfboardId())
                 .orElseThrow(() -> new RuntimeException("Surfboard not found with ID: " + request.getSurfboardId()));
-    
+
         if (!board.isShopOwned()) {
             throw new IllegalStateException("Cannot rent a user-owned board.");
         }
-    
+
         if (!board.isAvailableForRental()) {
             throw new IllegalStateException("Surfboard not available for rental.");
         }
-    
+
+        // Mark board as unavailable
+        board.setAvailable(false);
+        surfboardRepository.save(board);
+
         // Create rental
         Rental rental = new Rental();
         rental.setCustomerId(customer.getId());
         rental.setSurfboardId(board.getId());
         rental.setRentedAt(LocalDateTime.now());
-        rental.setStatus("CREATED");
+        rental.setStatus(RentalStatus.CREATED);
         Rental savedRental = rentalRepository.save(rental);
-    
+
         // Emit rental.created message
         rabbitTemplate.convertAndSend("surfboard.exchange", "rental.created", new RentalMessage(
-                savedRental.getId(), board.getId(), customer.getId(), false
-        ));
-    
-        System.out.println("✅ Rental created for surfboard ID: " + board.getId());
+                savedRental.getId(), board.getId(), customer.getId(), false));
+
+        System.out.println("✅ Rental created and board marked unavailable: " + board.getId());
     }
 
     public void returnBoard(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new RuntimeException("Rental not found with ID: " + rentalId));
-        rental.setReturnedAt(LocalDateTime.now());
-        rental.setStatus("RETURNED");
-        Rental savedRental = rentalRepository.save(rental);
 
         Surfboard board = surfboardRepository.findById(rental.getSurfboardId())
                 .orElseThrow(
                         () -> new IllegalStateException("Surfboard not found with ID: " + rental.getSurfboardId()));
 
-        // Only apply damage if board is not already damaged and no open repair exists
+        // Randomly simulate damage
         boolean isDamaged = new Random().nextBoolean();
+
+        rental.setReturnedAt(LocalDateTime.now());
+        rental.setStatus(RentalStatus.RETURNED);
+        rentalRepository.save(rental);
+
         if (isDamaged && !board.isDamaged()) {
             board.setDamaged(true);
-            board.setAvailable(false); // Mark as not available for rental
+            board.setAvailable(false);
             surfboardRepository.save(board);
 
-            // Send repair message
-            RepairMessage repairMsg = new RepairMessage(board.getId(), "Ding on the tail", rental.getCustomerId());
+            // Trigger repair
+            RepairMessage repairMsg = new RepairMessage(board.getId(), "Ding on the tail", rental.getCustomerId(), rental.getId());
             rabbitTemplate.convertAndSend("surfboard.exchange", "repair.created", repairMsg);
-            System.out.println("🛠️ Sent repair.created for board ID: " + board.getId());
+
+            System.out.println("🛠️ Repair created for damaged board ID: " + board.getId());
+        } else if (!isDamaged) {
+            // No damage → finalize return
+            board.setAvailable(true);
+            board.setDamaged(false);
+            surfboardRepository.save(board);
+
+            // Emit billing event (no repair needed)
+            RentalMessage rentalMessage = new RentalMessage(rental.getId(), rental.getSurfboardId(),
+                    rental.getCustomerId(), false);
+            rabbitTemplate.convertAndSend("surfboard.exchange", "rental.completed", rentalMessage);
+            System.out.println("💬 rental.completed sent (no damage) for rental ID: " + rental.getId());
         } else {
-            // No damage or already in repair
-            if (board.isDamaged()) {
-                System.out.println("⚠️ Skipped marking as damaged: already marked or repair exists.");
-            } else {
-                surfboardRepository.save(board);
-            }
+            System.out.println("⚠️ Damage already tracked. Awaiting repair completion.");
         }
 
-        // Emit rental.completed message
-        RentalMessage rentalMessage = new RentalMessage(savedRental.getId(), savedRental.getSurfboardId(),
-                savedRental.getCustomerId(), isDamaged);
-        rabbitTemplate.convertAndSend("surfboard.exchange", "rental.completed", rentalMessage);
-
-        // Randomly decide if a repair is needed
-        if (isDamaged) {
-            RepairMessage repairMsg = new RepairMessage(savedRental.getSurfboardId(), "Ding on the tail",
-                    savedRental.getCustomerId());
-            rabbitTemplate.convertAndSend("surfboard.exchange", "repair.created", repairMsg);
-        }
-        System.out.println("✅ Rental completed for rental ID: " + rentalId);
-    }
-
-    @RabbitListener(queues = "rental.completed.queue")
-    public void listenCompleted(RentalMessage msg) {
-        System.out.println("🎧 Received rental.completed: " + msg.getRentalId());
+        System.out.println("🔄 Board returned (pending): rental ID " + rentalId);
     }
 
 }

@@ -35,11 +35,9 @@ public class BillingController {
                 .toList();
     }
 
-    // List bills by surfboard
-    @GetMapping("/board/{surfboardId}")
-    public List<Bill> getBillsByBoard(@PathVariable Long surfboardId) {
-        return billingRepository.findAll().stream()
-                .filter(b -> surfboardId.equals(b.getSurfboardId()))
-                .toList();
+    @PostMapping("/{id}/pay")
+    public void payBill(@PathVariable Long id) {
+        billingService.markBillAsPaid(id);
     }
+
 }
