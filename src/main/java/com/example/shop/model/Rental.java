@@ -5,9 +5,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.example.shop.enums.RentalStatus;
 
@@ -15,27 +19,40 @@ import com.example.shop.enums.RentalStatus;
 public class Rental {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID id;
+  
+    private UUID surfboardId;
 
-    private Long surfboardId;
-    private Long customerId;
+    private UUID customerId;
     private LocalDateTime rentedAt;
     private LocalDateTime returnedAt;
+    private Double rentalFee;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RentalStatus status;
 
-    public Long getId() {
+ public UUID getId() {
         return id;
     }
-
-    public Long getSurfboardId() {
+    public void setId(UUID id) {
+        this.id = id;
+    }
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
-    public Long getCustomerId() {
+    public Double getRentalFee() {
+        return rentalFee;
+    }
+
+    public void setRentalFee(Double rentalFee) {
+        this.rentalFee = rentalFee;
+    }
+
+    public UUID getCustomerId() {
         return customerId;
     }
 
@@ -54,11 +71,12 @@ public class Rental {
     public void setStatus(RentalStatus status) {
         this.status = status;
     }
-    public void setSurfboardId(Long surfboardId) {
+
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
@@ -70,8 +88,4 @@ public class Rental {
         this.returnedAt = returnedAt;
     }
 
- 
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

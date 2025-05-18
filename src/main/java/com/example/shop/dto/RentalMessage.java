@@ -1,42 +1,45 @@
 package com.example.shop.dto;
 
- 
+import java.util.UUID;
+
 public class RentalMessage   {
-    private Long rentalId;
-    private Long surfboardId;
-    private Long customerId;
+    private UUID rentalId;
+    private UUID surfboardId;
+    private UUID customerId;
     private boolean damaged;
+    private Double rentalFee;
 
     public RentalMessage() {}         // Required for JSON deserialization
 
-    public RentalMessage(Long rentalId, Long surfboardId, Long customerId, boolean damaged) {
+    public RentalMessage(UUID rentalId, UUID surfboardId, UUID customerId, boolean damaged, Double rentalFee) {
         this.rentalId = rentalId;
         this.surfboardId = surfboardId;
         this.customerId = customerId;
         this.damaged = damaged;
+        this.rentalFee = rentalFee;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
 
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
@@ -47,5 +50,10 @@ public class RentalMessage   {
     public void setDamaged(boolean damaged) {
         this.damaged = damaged;
     }
-
+    public Double getRentalFee() {
+        return rentalFee;
+    }
+    public void setRentalFee(Double rentalFee) {
+        this.rentalFee = rentalFee;
+    }
 }

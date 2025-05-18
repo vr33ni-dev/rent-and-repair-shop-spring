@@ -1,23 +1,24 @@
 package com.example.shop.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.example.shop.enums.RepairStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairResponseDTO {
-    private Long repairId;
-    private Long surfboardId;
-    private Long customerId;
-    private Long rentalId;
+    private UUID repairId;
+    private UUID surfboardId;
+    private UUID customerId;
+    private UUID rentalId;
     private String surfboardName;
     private String customerName; // "Shop" if shop-owned
     private String issue;
     private RepairStatus status;
     private LocalDateTime createdAt;
 
-     public RepairResponseDTO(Long repairId, Long surfboardId, Long customerId, Long rentalId, String surfboardName, 
+     public RepairResponseDTO(UUID repairId, UUID surfboardId, UUID customerId, UUID rentalId, String surfboardName, 
             String issue, RepairStatus status, LocalDateTime createdAt, String customerName) {
         this.repairId = repairId;
         this.surfboardId = surfboardId;
@@ -30,32 +31,32 @@ public class RepairResponseDTO {
         this.createdAt = createdAt;
     }
 
-    public Long getRepairId() {
+    public UUID getRepairId() {
         return repairId;
     }
 
-    public void setRepairId(Long repairId) {
+    public void setRepairId(UUID repairId) {
         this.repairId = repairId;
     }
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
  

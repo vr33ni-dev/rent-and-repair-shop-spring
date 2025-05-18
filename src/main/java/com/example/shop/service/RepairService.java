@@ -4,12 +4,15 @@ import com.example.shop.dto.RentalMessage;
 import com.example.shop.dto.RepairMessage;
 import com.example.shop.dto.RepairRequest;
 import com.example.shop.dto.RepairResponseDTO;
+import com.example.shop.enums.BillStatus;
 import com.example.shop.enums.RentalStatus;
 import com.example.shop.enums.RepairStatus;
+import com.example.shop.model.Bill;
 import com.example.shop.model.Customer;
 import com.example.shop.model.Rental;
 import com.example.shop.model.Repair;
 import com.example.shop.model.Surfboard;
+import com.example.shop.repository.BillingRepository;
 import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
@@ -18,30 +21,30 @@ import com.example.shop.repository.SurfboardRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RepairService {
 
-    private final RentalRepository rentalRepository;
-
+ 
     private final RepairRepository repairRepository;
+    private final BillingRepository billingRepository;
     private final SurfboardRepository surfboardRepository;
     private final CustomerRepository customerRepository;
-    private final RabbitTemplate rabbitTemplate;
-
+ 
     public RepairService(RepairRepository repairRepository, SurfboardRepository surfboardRepository,
             CustomerRepository customerRepository,
-            RabbitTemplate rabbitTemplate, RentalRepository rentalRepository) {
+            BillingRepository billingRepository, RentalRepository rentalRepository) {
         this.repairRepository = repairRepository;
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
-        this.rabbitTemplate = rabbitTemplate;
-        this.rentalRepository = rentalRepository;
+         this.billingRepository = billingRepository;
     }
 
     public List<RepairResponseDTO> getAllRepairs() {
@@ -96,7 +99,7 @@ public class RepairService {
             return customerRepository.save(newCustomer);
         });
 
-        Long boardId = request.getSurfboardId();
+        UUID boardId = request.getSurfboardId();
 
         boolean repairExists = repairRepository
                 .findBySurfboardIdAndStatusNot(boardId, RepairStatus.COMPLETED)
@@ -117,53 +120,42 @@ public class RepairService {
         System.out.println("Manual repair created with ID: " + repair.getId());
     }
 
-    public void markRepairAsCompleted(Long repairId) {
+  @Transactional
+    public void markRepairAsCompleted(UUID repairId) {
         Repair repair = repairRepository.findById(repairId)
-                .orElseThrow(() -> new IllegalArgumentException("Repair not found with ID: " + repairId));
-
-        // Update repair status
+            .orElseThrow(() -> new RuntimeException("Repair not found: " + repairId));
+        repair.setCompletedAt(LocalDateTime.now());
         repair.setStatus(RepairStatus.COMPLETED);
         repairRepository.save(repair);
 
-        surfboardRepository.findById(repair.getSurfboardId()).ifPresent(board -> {
-            if (board.isShopOwned()) {
-                board.setDamaged(false);
-                board.setAvailable(true);
-                surfboardRepository.save(board);
-                System.out.println("🔧 Shop board marked as repaired: " + board.getId());
-            } else {
-                System.out.println("🔧 User-owned board repair completed (no status update on surfboard)");
-            }
-        });
+        // make board available again
+        Surfboard board = surfboardRepository.findById(repair.getSurfboardId())
+            .orElseThrow(() -> new RuntimeException("Board not found: " + repair.getSurfboardId()));
+        board.setDamaged(false);
+        board.setAvailable(true);
+        surfboardRepository.save(board);
 
-        // Emit repair.completed message (customerId optional in RepairMessage if
-        // tracked)
-        RepairMessage msg = new RepairMessage(repair.getSurfboardId(), repair.getIssue(), repair.getCustomerId(),
-                repair.getRentalId());
-        rabbitTemplate.convertAndSend("surfboard.exchange", "repair.completed", msg);
-
-        if (repair.getRentalId() != null) {
-            Rental rental = rentalRepository.findById(repair.getRentalId())
-                    .orElseThrow(
-                            () -> new IllegalArgumentException("Rental not found with ID: " + repair.getRentalId()));
-
-            if (rental.getStatus() != RentalStatus.BILLED) {
-                RentalMessage rentalMessage = new RentalMessage(
-                        rental.getId(),
-                        rental.getSurfboardId(),
-                        rental.getCustomerId(),
-                        false);
-                rabbitTemplate.convertAndSend("surfboard.exchange", "rental.completed", rentalMessage);
-
-                rental.setStatus(RentalStatus.BILLED); // 👈 prevent re-emission
-                rentalRepository.save(rental);
-            }
+        // create a “repair completed” bill if not already created
+        boolean exists = billingRepository
+            .existsByCustomerIdAndRepairId(repair.getCustomerId(), repairId);
+        if (!exists) {
+            Bill bill = new Bill();
+            bill.setCustomerId(repair.getCustomerId());
+            bill.setRepairId(repairId);
+            bill.setRentalId(repair.getRentalId());
+            bill.setRepairFee(repair.getRepairFee());
+            bill.setRentalFee(0.0);
+            bill.setTotalAmount(repair.getRepairFee());
+            bill.setCreatedAt(LocalDateTime.now());
+            bill.setStatus(BillStatus.COMPLETED);
+            bill.setDescription(String.format("Repair fee for board %s", board.getId()));
+            billingRepository.save(bill);
         }
 
-        System.out.println("Repair.completed sent for board ID: " + repair.getSurfboardId());
+        System.out.println("🛠️ completeRepair done: " + repairId);
     }
-
-    public void cancelRepair(Long repairId) {
+    
+    public void cancelRepair(UUID repairId) {
         Repair repair = repairRepository.findById(repairId)
                 .orElseThrow(() -> new IllegalArgumentException("Repair not found with ID: " + repairId));
 
@@ -194,7 +186,7 @@ public class RepairService {
             System.out.println("⚠️ Repair already exists for surfboard ID: " + board.getId() + ", skipping.");
             return;
         }
-        Long ownerId = message.getCustomerId();
+        UUID ownerId = message.getCustomerId();
         if (ownerId != null) {
             customerRepository.findById(ownerId)
                     .orElseGet(() -> {

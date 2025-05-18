@@ -1,7 +1,9 @@
 package com.example.shop.controller;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,18 +41,18 @@ public class RepairController {
     }
 
     @GetMapping("/customer/{customerId}")
-    public List<Repair> getRepairsByUser(@PathVariable Long customerId) {
+    public List<Repair> getRepairsByUser(@PathVariable UUID customerId) {
         return repairRepository.findByCustomerId(customerId);
     }
 
     @PostMapping("/{repairId}/complete")
-    public String markRepairAsCompleted(@PathVariable Long repairId) {
-        repairService.markRepairAsCompleted(repairId);
-        return "Repair completed!";
+     public ResponseEntity<Void> markRepairAsCompleted(@PathVariable UUID id) {
+        repairService.markRepairAsCompleted(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{repairId}/cancel")
-    public String cancelRepair(@PathVariable Long repairId) {
+    public String cancelRepair(@PathVariable UUID repairId) {
         repairService.cancelRepair(repairId);
         return "Repair canceled!";
     }

@@ -7,7 +7,6 @@ spring:
       initialization-fail-timeout: 10000
       connection-timeout: 20000
   jpa:
-    generate-ddl: true
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -20,9 +19,9 @@ spring:
     port: 5672
     username: guest
     password: guest
-    # listener:
-    #   simple:
-    #     default-requeue-rejected: false
+    publisher-confirm-type: correlated
+    publisher-returns: true
+
 server:
   port: 8080
   
@@ -30,6 +29,8 @@ logging:
   level:
     root: DEBUG
     org.springframework: DEBUG
+    org.springframework.amqp: DEBUG
+    org.springframework.amqp.rabbit: DEBUG
  
 
 

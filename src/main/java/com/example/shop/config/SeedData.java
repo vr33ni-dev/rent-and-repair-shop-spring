@@ -68,6 +68,7 @@ public class SeedData implements ApplicationListener<ContextRefreshedEvent> {
 
             rental1.setSurfboardId(shopBoard3.getId());
             rental1.setCustomerId(customer3.getId());
+            rental1.setRentalFee(15.0);
             rental1.setRentedAt(LocalDateTime.now().minusDays(1));
             rental1.setStatus(RentalStatus.CREATED);
             rentalRepo.save(rental1);

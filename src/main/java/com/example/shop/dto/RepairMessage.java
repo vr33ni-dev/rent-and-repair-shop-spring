@@ -1,26 +1,30 @@
 package com.example.shop.dto;
 
+import java.util.UUID;
+
 public class RepairMessage {
     
-    private Long surfboardId;
+    private UUID surfboardId;
     private String issue;
-    private Long customerId; 
-    private Long rentalId;
+    private UUID customerId; 
+    private UUID rentalId;
+    private Double repairFee;
 
     public RepairMessage() {}
 
-    public RepairMessage(Long surfboardId, String issue, Long customerId, Long rentalId) {
+    public RepairMessage(UUID surfboardId, String issue, UUID customerId, UUID rentalId, Double repairFee) {
         this.surfboardId = surfboardId;
         this.issue = issue;
         this.customerId = customerId;
         this.rentalId = rentalId;
+        this.repairFee = repairFee;
     }
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 
@@ -32,19 +36,25 @@ public class RepairMessage {
         this.issue = issue;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }       
     
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
+    }
+    public Double getRepairFee() {
+        return repairFee;
+    }   
+    public void setRepairFee(Double repairFee) {
+        this.repairFee = repairFee;
     }
 }

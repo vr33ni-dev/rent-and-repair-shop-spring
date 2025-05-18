@@ -5,6 +5,7 @@ import com.example.shop.repository.CustomerRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -30,7 +31,7 @@ public class CustomerController {
 
     // Get customer by ID (optional)
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Long id) {
+    public Customer getCustomerById(@PathVariable UUID id) {
         return customerRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + id));
     }

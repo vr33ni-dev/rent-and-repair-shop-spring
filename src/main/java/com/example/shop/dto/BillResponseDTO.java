@@ -1,15 +1,16 @@
 package com.example.shop.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.example.shop.enums.BillStatus;
  
 public class BillResponseDTO {
-    private Long id;
-    private Long customerId;
+    private UUID id;
+    private UUID customerId;
     private String customerName;
-    private Long rentalId;
-    private Long repairId;
+    private UUID rentalId;
+    private UUID repairId;
     private double rentalFee;
     private double repairFee;
     private double totalAmount;
@@ -19,8 +20,8 @@ public class BillResponseDTO {
     private LocalDateTime repairDate;
     private String description;
 
-    public BillResponseDTO(Long id, Long customerId, String customerName, String description,
-            Long rentalId, Long repairId,
+    public BillResponseDTO(UUID id, UUID customerId, String customerName, String description,
+    UUID rentalId, UUID repairId,
             double rentalFee, double repairFee, double totalAmount,
             BillStatus status, LocalDateTime billCreatedAt,
             LocalDateTime rentalDate, LocalDateTime repairDate) {
@@ -40,19 +41,19 @@ public class BillResponseDTO {
     }
 
     // Getters and setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
@@ -103,19 +104,19 @@ public BillStatus getStatus() {
         this.status = status;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
 
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
 
-    public Long getRepairId() {
+    public UUID getRepairId() {
         return repairId;
     }
 
-    public void setRepairId(Long repairId) {
+    public void setRepairId(UUID repairId) {
         this.repairId = repairId;
     }
 

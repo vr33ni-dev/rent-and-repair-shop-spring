@@ -8,6 +8,7 @@ import com.example.shop.service.BillingService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/bills")
@@ -29,14 +30,14 @@ public class BillingController {
 
     // List bills by user
     @GetMapping("/customer/{customerId}")
-    public List<Bill> getBillsByUser(@PathVariable Long customerId) {
+    public List<Bill> getBillsByUser(@PathVariable UUID customerId) {
         return billingRepository.findAll().stream()
                 .filter(b -> customerId.equals(b.getCustomerId()))
                 .toList();
     }
 
     @PostMapping("/{id}/pay")
-    public void payBill(@PathVariable Long id) {
+    public void payBill(@PathVariable UUID id) {
         billingService.markBillAsPaid(id);
     }
 

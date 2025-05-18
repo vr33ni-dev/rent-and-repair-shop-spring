@@ -2,13 +2,17 @@ package com.example.shop.controller;
 
 import com.example.shop.dto.RentalRequest;
 import com.example.shop.dto.RentalResponseDTO;
+import com.example.shop.dto.ReturnRequest;
 import com.example.shop.enums.RentalStatus;
 import com.example.shop.model.Rental;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.service.RentalService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/rentals")
@@ -30,10 +34,18 @@ public class RentalController {
     }
 
     // Return rented board
-    @PostMapping("/{rentalId}/return")
-    public String returnBoard(@PathVariable Long rentalId) {
-        rentalService.returnBoard(rentalId);
-        return "Board returned!";
+   @PostMapping("/{id}/return")
+    public ResponseEntity<Void> returnBoard(
+        @PathVariable UUID id,
+        @RequestBody ReturnRequest req
+    ) {
+        rentalService.returnBoard(
+            id,
+            req.isDamaged(),
+            req.getDamageDescription(),
+            req.getRepairPrice()
+        );
+        return ResponseEntity.ok().build();
     }
 
     // List all rentals
@@ -44,7 +56,7 @@ public class RentalController {
 
     // Filter by customerId
     @GetMapping("/customer/{customerId}")
-    public List<Rental> getRentalsByUser(@PathVariable Long customerId) {
+    public List<Rental> getRentalsByUser(@PathVariable UUID customerId) {
         return rentalRepository.findByCustomerId(customerId);
     }
 

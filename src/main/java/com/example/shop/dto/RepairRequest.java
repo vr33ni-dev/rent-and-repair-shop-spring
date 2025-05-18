@@ -1,16 +1,18 @@
 package com.example.shop.dto;
 
+import java.util.UUID;
+
 public class RepairRequest {
-    private Long surfboardId;
+    private UUID surfboardId;
     private String issue;
     private String customerName;
     private String customerContact;
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 

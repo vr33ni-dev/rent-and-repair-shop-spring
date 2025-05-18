@@ -1,6 +1,9 @@
 package com.example.shop.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.example.shop.enums.RepairStatus;
 
@@ -15,36 +18,47 @@ import jakarta.persistence.Id;
 public class Repair {
 
     @Id
-    @GeneratedValue
-    private Long id;
-    private Long customerId;  
-    private Long rentalId;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID id;
+
+    private UUID customerId;  
+
+    private UUID rentalId;
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
-    private Long surfboardId;
+
+    private UUID surfboardId;
     private String issue;
+    private Double repairFee;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RepairStatus status;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public Long getCustomerId() {
+    public Double getRepairFee() {
+        return repairFee;
+    }
+    public void setRepairFee(Double repairFee) {
+        this.repairFee = repairFee;
+    }
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
 
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
@@ -53,15 +67,15 @@ public class Repair {
     }
  
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 

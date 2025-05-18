@@ -1,24 +1,27 @@
 package com.example.shop.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.example.shop.enums.RentalStatus;
 
 public class RentalResponseDTO {
-    private Long rentalId;
-    private Long surfboardId;
-    private Long customerId;
+    private UUID rentalId;
+    private UUID surfboardId;
+    private UUID customerId;
+    private Double rentalFee;
     private String surfboardName;
     private String customerName;
     private LocalDateTime rentedAt;
     private LocalDateTime returnedAt;
     private RentalStatus status;
 
-    public RentalResponseDTO(Long rentalId, Long surfboardId, Long customerId, String surfboardName, String customerName,
+    public RentalResponseDTO(UUID rentalId, UUID surfboardId, UUID customerId, Double rentalFee, String surfboardName, String customerName,
             LocalDateTime rentedAt, LocalDateTime returnedAt, RentalStatus status) {
         this.rentalId = rentalId;
         this.surfboardId = surfboardId;
         this.customerId = customerId;
+        this.rentalFee = rentalFee;
         this.surfboardName = surfboardName;
         this.customerName = customerName;
         this.rentedAt = rentedAt;
@@ -26,29 +29,35 @@ public class RentalResponseDTO {
         this.status = status;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
 
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
 
-    public Long getSurfboardId() {
+    public UUID getSurfboardId() {
         return surfboardId;
     }
 
-    public void setSurfboardId(Long surfboardId) {
+    public void setSurfboardId(UUID surfboardId) {
         this.surfboardId = surfboardId;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
+    public Double getRentalFee() {
+        return rentalFee;
+    }
+    public void setRentalFee(Double rentalFee) {
+        this.rentalFee = rentalFee;
+    }
     public String getSurfboardName() {
         return surfboardName;
     }

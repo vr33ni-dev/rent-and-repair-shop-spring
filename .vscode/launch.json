@@ -2,16 +2,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Spring Boot-RentAndAndRepairShopApplication<rent-and-repair-shop_39fac759>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.example.shop.RentAndAndRepairShopApplication",
-            "projectName": "rent-and-repair-shop_39fac759",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
             "name": "Spring Boot-RentAndAndRepairShopApplication<rent-and-repair-shop>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

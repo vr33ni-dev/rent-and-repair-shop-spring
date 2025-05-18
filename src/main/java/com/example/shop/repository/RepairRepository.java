@@ -6,14 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
  
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
  
-public interface RepairRepository extends JpaRepository<Repair, Long> {
+public interface RepairRepository extends JpaRepository<Repair, UUID> {
 
-    List<Repair> findBySurfboardId(Long surfboardId);
-    List<Repair> findByCustomerId(Long customerId);
-    List<Repair> findBySurfboardIdAndStatusNot(Long surfboardId, RepairStatus status);
-    Optional<Repair> findTopBySurfboardIdAndCustomerIdOrderByCreatedAtDesc(Long surfboardId, Long customerId);
+    List<Repair> findBySurfboardId(UUID surfboardId);
+    List<Repair> findByCustomerId(UUID customerId);
+    List<Repair> findBySurfboardIdAndStatusNot(UUID surfboardId, RepairStatus status);
+    Optional<Repair> findTopBySurfboardIdAndCustomerIdOrderByCreatedAtDesc(UUID surfboardId, UUID customerId);
 
 
 }

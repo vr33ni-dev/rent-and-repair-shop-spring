@@ -2,6 +2,9 @@ package com.example.shop.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.example.shop.enums.BillStatus;
 
@@ -9,12 +12,16 @@ import com.example.shop.enums.BillStatus;
 public class Bill {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID id;
     private String description; // e.g., "Rental", "Repair"
-    private Long rentalId; // to associate with the rental
-    private Long repairId; // to associate with the repair
-    private Long customerId;
+
+    private UUID rentalId; // to associate with the rental
+   
+    private UUID repairId; // to associate with the repair
+   
+    private UUID customerId;
     private Double rentalFee;
     private Double repairFee;
 
@@ -26,11 +33,11 @@ public class Bill {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -42,27 +49,27 @@ public class Bill {
         this.totalAmount = totalAmount;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 
-    public Long getRentalId() {
+    public UUID getRentalId() {
         return rentalId;
     }
 
-    public void setRentalId(Long rentalId) {
+    public void setRentalId(UUID rentalId) {
         this.rentalId = rentalId;
     }
 
-    public Long getRepairId() {
+    public UUID getRepairId() {
         return repairId;
     }
 
-    public void setRepairId(Long repairId) {
+    public void setRepairId(UUID repairId) {
         this.repairId = repairId;
     }
 

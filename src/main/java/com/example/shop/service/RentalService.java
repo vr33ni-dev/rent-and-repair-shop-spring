@@ -1,42 +1,54 @@
 package com.example.shop.service;
 
-import com.example.shop.dto.RentalMessage;
+ import com.example.shop.dto.RentalMessage;
 import com.example.shop.dto.RepairMessage;
+import com.example.shop.enums.BillStatus;
 import com.example.shop.enums.RentalStatus;
+import com.example.shop.enums.RepairStatus;
 import com.example.shop.dto.RentalRequest;
 import com.example.shop.dto.RentalResponseDTO;
+import com.example.shop.model.Bill;
 import com.example.shop.model.Customer;
 import com.example.shop.model.Rental;
+import com.example.shop.model.Repair;
 import com.example.shop.model.Surfboard;
+import com.example.shop.repository.BillingRepository;
 import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
+import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class RentalService {
 
     private final RentalRepository rentalRepository;
+    private final RepairRepository repairRepository;
     private final SurfboardRepository surfboardRepository;
     private final CustomerRepository customerRepository;
-
-    private final RabbitTemplate rabbitTemplate;
+    private final BillingRepository billingRepository;
 
     public RentalService(RentalRepository rentalRepository, SurfboardRepository surfboardRepository,
-            CustomerRepository customerRepository,
-            RabbitTemplate rabbitTemplate) {
+            CustomerRepository customerRepository, BillingRepository billingRepository,
+           RepairRepository repairRepository) {
         this.rentalRepository = rentalRepository;
-        this.rabbitTemplate = rabbitTemplate;
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
+        this.billingRepository = billingRepository;
+        this.repairRepository = repairRepository;
     }
 
     public List<RentalResponseDTO> getAllRentalDTOs() {
@@ -57,6 +69,7 @@ public class RentalService {
                     rental.getId(),
                     rental.getSurfboardId(),
                     rental.getCustomerId(),
+                    rental.getRentalFee(),
                     boardName,
                     customerName,
                     rental.getRentedAt(),
@@ -108,58 +121,68 @@ public class RentalService {
         Rental rental = new Rental();
         rental.setCustomerId(customer.getId());
         rental.setSurfboardId(board.getId());
+        rental.setRentalFee(request.getRentalFee() != null ? request.getRentalFee() : 15.0);
         rental.setRentedAt(LocalDateTime.now());
         rental.setStatus(RentalStatus.CREATED);
-        Rental savedRental = rentalRepository.save(rental);
+         rentalRepository.save(rental);
 
-        // Emit rental.created message
-        rabbitTemplate.convertAndSend("surfboard.exchange", "rental.created", new RentalMessage(
-                savedRental.getId(), board.getId(), customer.getId(), false));
-
-        System.out.println("✅ Rental created and board marked unavailable: " + board.getId());
+      
+        System.out.println("✅ Rental created and board marked unavailable: " + rental.getId());
     }
-
-    public void returnBoard(Long rentalId) {
+ 
+    @Transactional
+    public void returnBoard(UUID rentalId,
+                            boolean isDamaged,
+                            String damageDescription,
+                            Double repairPrice) {
+        // 1) Load & update Rental
         Rental rental = rentalRepository.findById(rentalId)
-                .orElseThrow(() -> new RuntimeException("Rental not found with ID: " + rentalId));
-
-        Surfboard board = surfboardRepository.findById(rental.getSurfboardId())
-                .orElseThrow(
-                        () -> new IllegalStateException("Surfboard not found with ID: " + rental.getSurfboardId()));
-
-        // Randomly simulate damage
-        boolean isDamaged = new Random().nextBoolean();
-
+            .orElseThrow(() -> new RuntimeException("Rental not found: " + rentalId));
         rental.setReturnedAt(LocalDateTime.now());
         rental.setStatus(RentalStatus.RETURNED);
         rentalRepository.save(rental);
 
-        if (isDamaged && !board.isDamaged()) {
-            board.setDamaged(true);
-            board.setAvailable(false);
-            surfboardRepository.save(board);
+        // 2) Load & update Surfboard
+        Surfboard board = surfboardRepository.findById(rental.getSurfboardId())
+            .orElseThrow(() -> new IllegalStateException("Board not found: " + rental.getSurfboardId()));
+        board.setDamaged(isDamaged);
+        board.setAvailable(!isDamaged);
+        surfboardRepository.save(board);
 
-            // Trigger repair
-            RepairMessage repairMsg = new RepairMessage(board.getId(), "Ding on the tail", rental.getCustomerId(), rental.getId());
-            rabbitTemplate.convertAndSend("surfboard.exchange", "repair.created", repairMsg);
+        // 3) Always create a Bill
+        double rentalFee = rental.getRentalFee() != null ? rental.getRentalFee() : 15.0;
+        double feeToBill = isDamaged
+            ? repairPrice != null ? repairPrice : 0.0
+            : rentalFee;
 
-            System.out.println("🛠️ Repair created for damaged board ID: " + board.getId());
-        } else if (!isDamaged) {
-            // No damage → finalize return
-            board.setAvailable(true);
-            board.setDamaged(false);
-            surfboardRepository.save(board);
+        Bill bill = new Bill();
+        bill.setCustomerId(rental.getCustomerId());
+        bill.setRentalId(isDamaged ? null : rentalId);
+        bill.setRepairId(isDamaged ? null : null); // set below if needed
+        bill.setRentalFee(isDamaged ? 0.0 : rentalFee);
+        bill.setRepairFee(isDamaged ? feeToBill : 0.0);
+        bill.setTotalAmount(feeToBill);
+        bill.setCreatedAt(LocalDateTime.now());
+        bill.setStatus(BillStatus.COMPLETED);
+        bill.setDescription(isDamaged
+            ? String.format("Repair fee for board %s, rental %s", board.getId(), rentalId)
+            : String.format("Rental fee for rental %s", rentalId));
+        billingRepository.save(bill);
 
-            // Emit billing event (no repair needed)
-            RentalMessage rentalMessage = new RentalMessage(rental.getId(), rental.getSurfboardId(),
-                    rental.getCustomerId(), false);
-            rabbitTemplate.convertAndSend("surfboard.exchange", "rental.completed", rentalMessage);
-            System.out.println("💬 rental.completed sent (no damage) for rental ID: " + rental.getId());
-        } else {
-            System.out.println("⚠️ Damage already tracked. Awaiting repair completion.");
+        // 4) If damaged, also create a Repair record
+        if (isDamaged) {
+            Repair repair = new Repair();
+            repair.setSurfboardId(board.getId());
+            repair.setCustomerId(rental.getCustomerId());
+            repair.setRentalId(rentalId);
+            repair.setIssue(damageDescription);
+            repair.setRepairFee(feeToBill);
+            repair.setStatus(RepairStatus.CREATED);
+            repair.setCreatedAt(LocalDateTime.now());
+            repairRepository.save(repair);
         }
 
-        System.out.println("🔄 Board returned (pending): rental ID " + rentalId);
+        System.out.println("🔄 returnBoard complete: rental=" + rentalId +
+                           ", damaged=" + isDamaged);
     }
-
 }
