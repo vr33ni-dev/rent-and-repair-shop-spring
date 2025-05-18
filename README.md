@@ -1,11 +1,10 @@
 # Rent and Repair Shop
 
-This is a Spring Boot application that manages a surfboard rental and repair shop. It integrates with RabbitMQ for messaging and uses PostgreSQL as the database.
+This is a Spring Boot application that manages a surfboard rental and repair shop. It uses PostgreSQL as the database.
 
 ## Features
 
 - Manage surfboard rentals and repairs.
-- RabbitMQ integration for event-driven communication.
 - RESTful APIs for managing surfboards, rentals, and repairs.
 - PostgreSQL for data persistence.
 
@@ -13,7 +12,7 @@ This is a Spring Boot application that manages a surfboard rental and repair sho
 
 - Java 17 or higher
 - Maven
-- Docker (for RabbitMQ and PostgreSQL)
+- Docker (for PostgreSQL)
 
 ## Getting Started
 
@@ -24,7 +23,7 @@ git clone <repository-url>
 cd rent-and-repair-shop
 ```
 
-### 2. Start RabbitMQ and PostgreSQL
+### 2. Start PostgreSQL
 
 Use Docker Compose to start the required services:
 
@@ -63,7 +62,7 @@ curl -X GET http://localhost:8080/api/surfboards/all
         |       `-- example
         |           `-- shop
         |               |-- config
-        |               |   |-- RabbitMQConfig.java
+        |               |   |-- CorsConfig.java
         |               |   `-- SeedData.java
         |               |-- controller
         |               |   |-- RentalController.java
@@ -95,10 +94,6 @@ curl -X GET http://localhost:8080/api/surfboards/all
 ```
 
 ## Configuration
-
-### RabbitMQ
-
-The application uses RabbitMQ for messaging. Queues and exchanges are configured in RabbitMQConfig.java.
 
 ### Database
 

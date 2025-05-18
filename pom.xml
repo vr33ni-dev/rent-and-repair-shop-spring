@@ -8,7 +8,7 @@
     <artifactId>rent-and-repair-shop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Rent and Repair Shop</name>
-    <description>Surfboard Rental and Repair App with Spring Boot + RabbitMQ</description>
+    <description>Surfboard Rental and Repair App with Spring Boot + Docker</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -38,12 +38,6 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-        </dependency>
-
-        <!-- RabbitMQ Messaging -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
         <!-- Jackson for JSON serialization -->

@@ -1,7 +1,6 @@
 package com.example.shop;
 
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.boot.CommandLineRunner;
+ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +10,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.Metamodel;
 
 @SpringBootApplication
-@EnableRabbit
 public class RentAndAndRepairShopApplication {
 
     public static void main(String[] args) {

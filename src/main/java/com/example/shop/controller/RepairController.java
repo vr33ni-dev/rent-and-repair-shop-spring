@@ -46,8 +46,8 @@ public class RepairController {
     }
 
     @PostMapping("/{repairId}/complete")
-     public ResponseEntity<Void> markRepairAsCompleted(@PathVariable UUID id) {
-        repairService.markRepairAsCompleted(id);
+     public ResponseEntity<Void> markRepairAsCompleted(@PathVariable UUID repairId) {
+        repairService.markRepairAsCompleted(repairId);
         return ResponseEntity.ok().build();
     }
 

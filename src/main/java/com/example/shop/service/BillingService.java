@@ -13,7 +13,6 @@ import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

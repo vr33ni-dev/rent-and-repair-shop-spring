@@ -28,7 +28,8 @@ public class Repair {
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
 
-    private UUID surfboardId;
+    private UUID surfboardId; // show owned board - one of these will be non null
+
     private String issue;
     private Double repairFee;
 
@@ -39,6 +40,7 @@ public class Repair {
     public UUID getId() {
         return id;
     }
+
 
     public Double getRepairFee() {
         return repairFee;

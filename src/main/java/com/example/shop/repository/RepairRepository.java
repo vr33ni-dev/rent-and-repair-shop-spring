@@ -15,6 +15,7 @@ public interface RepairRepository extends JpaRepository<Repair, UUID> {
     List<Repair> findByCustomerId(UUID customerId);
     List<Repair> findBySurfboardIdAndStatusNot(UUID surfboardId, RepairStatus status);
     Optional<Repair> findTopBySurfboardIdAndCustomerIdOrderByCreatedAtDesc(UUID surfboardId, UUID customerId);
+    boolean existsBySurfboardIdAndStatusNot(UUID surfboardId, RepairStatus status);
 
 
 }

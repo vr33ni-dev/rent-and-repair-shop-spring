@@ -1,15 +1,11 @@
 package com.example.shop.service;
 
-import com.example.shop.dto.RentalMessage;
-import com.example.shop.dto.RepairMessage;
 import com.example.shop.dto.RepairRequest;
 import com.example.shop.dto.RepairResponseDTO;
 import com.example.shop.enums.BillStatus;
-import com.example.shop.enums.RentalStatus;
 import com.example.shop.enums.RepairStatus;
 import com.example.shop.model.Bill;
 import com.example.shop.model.Customer;
-import com.example.shop.model.Rental;
 import com.example.shop.model.Repair;
 import com.example.shop.model.Surfboard;
 import com.example.shop.repository.BillingRepository;
@@ -24,27 +20,24 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RepairService {
 
- 
     private final RepairRepository repairRepository;
     private final BillingRepository billingRepository;
     private final SurfboardRepository surfboardRepository;
     private final CustomerRepository customerRepository;
- 
+
     public RepairService(RepairRepository repairRepository, SurfboardRepository surfboardRepository,
             CustomerRepository customerRepository,
             BillingRepository billingRepository, RentalRepository rentalRepository) {
         this.repairRepository = repairRepository;
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
-         this.billingRepository = billingRepository;
+        this.billingRepository = billingRepository;
     }
 
     public List<RepairResponseDTO> getAllRepairs() {
@@ -55,7 +48,12 @@ public class RepairService {
                     .orElseThrow(
                             () -> new IllegalStateException("Surfboard not found for repair ID: " + repair.getId()));
 
-            String boardName = board.getName();
+            String boardName = null;
+            if (repair.getSurfboardId() != null) {
+                boardName = surfboardRepository.findById(repair.getSurfboardId())
+                        .map(Surfboard::getName)
+                        .orElse(null);
+            }
             String customerName = "Shop";
 
             if (repair.getCustomerId() != null) {
@@ -69,7 +67,7 @@ public class RepairService {
                     repair.getSurfboardId(),
                     repair.getCustomerId(),
                     repair.getRentalId(),
-                    boardName,
+                    boardName,              
                     repair.getIssue(),
                     repair.getStatus(),
                     repair.getCreatedAt(),
@@ -99,7 +97,21 @@ public class RepairService {
             return customerRepository.save(newCustomer);
         });
 
-        UUID boardId = request.getSurfboardId();
+        // 2) Determine the boardId: either existing shop board, or new customer board
+        UUID boardId;
+        if (request.getSurfboardId() != null) {
+            // shop-owned repair
+            boardId = request.getSurfboardId();
+        } else {
+            // customer-owned: create a new Surfboard row
+            Surfboard board = new Surfboard();
+            board.setName(request.getSurfboardName());
+            board.setShopOwned(false);
+            board.setAvailable(false);
+            board.setDamaged(true);
+            board = surfboardRepository.save(board);
+            boardId = board.getId();
+        }
 
         boolean repairExists = repairRepository
                 .findBySurfboardIdAndStatusNot(boardId, RepairStatus.COMPLETED)
@@ -112,32 +124,33 @@ public class RepairService {
         }
 
         Repair repair = new Repair();
-        repair.setSurfboardId(request.getSurfboardId());
+        repair.setSurfboardId(boardId);
         repair.setCustomerId(customer.getId());
         repair.setIssue(request.getIssue());
         repair.setStatus(RepairStatus.CREATED);
+        repair.setCreatedAt(LocalDateTime.now());  
         repairRepository.save(repair);
         System.out.println("Manual repair created with ID: " + repair.getId());
     }
 
-  @Transactional
+    @Transactional
     public void markRepairAsCompleted(UUID repairId) {
         Repair repair = repairRepository.findById(repairId)
-            .orElseThrow(() -> new RuntimeException("Repair not found: " + repairId));
+                .orElseThrow(() -> new RuntimeException("Repair not found: " + repairId));
         repair.setCompletedAt(LocalDateTime.now());
         repair.setStatus(RepairStatus.COMPLETED);
         repairRepository.save(repair);
 
         // make board available again
         Surfboard board = surfboardRepository.findById(repair.getSurfboardId())
-            .orElseThrow(() -> new RuntimeException("Board not found: " + repair.getSurfboardId()));
+                .orElseThrow(() -> new RuntimeException("Board not found: " + repair.getSurfboardId()));
         board.setDamaged(false);
         board.setAvailable(true);
         surfboardRepository.save(board);
 
         // create a “repair completed” bill if not already created
         boolean exists = billingRepository
-            .existsByCustomerIdAndRepairId(repair.getCustomerId(), repairId);
+                .existsByCustomerIdAndRepairId(repair.getCustomerId(), repairId);
         if (!exists) {
             Bill bill = new Bill();
             bill.setCustomerId(repair.getCustomerId());
@@ -154,7 +167,7 @@ public class RepairService {
 
         System.out.println("🛠️ completeRepair done: " + repairId);
     }
-    
+
     public void cancelRepair(UUID repairId) {
         Repair repair = repairRepository.findById(repairId)
                 .orElseThrow(() -> new IllegalArgumentException("Repair not found with ID: " + repairId));
@@ -167,45 +180,6 @@ public class RepairService {
         repairRepository.save(repair);
 
         System.out.println("Repair canceled: ID " + repairId);
-    }
-
-    @RabbitListener(queues = "repair.queue")
-    public void processRepair(RepairMessage message) {
-        System.out.println("📥 Repair requested for board ID: " + message.getSurfboardId());
-
-        Surfboard board = surfboardRepository.findById(message.getSurfboardId())
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Surfboard not found with ID: " + message.getSurfboardId()));
-
-        boolean repairExists = repairRepository
-                .findBySurfboardIdAndStatusNot(board.getId(), RepairStatus.COMPLETED)
-                .stream()
-                .anyMatch(r -> r.getStatus() != RepairStatus.CANCELED);
-
-        if (repairExists) {
-            System.out.println("⚠️ Repair already exists for surfboard ID: " + board.getId() + ", skipping.");
-            return;
-        }
-        UUID ownerId = message.getCustomerId();
-        if (ownerId != null) {
-            customerRepository.findById(ownerId)
-                    .orElseGet(() -> {
-                        Customer newCustomer = new Customer();
-                        newCustomer.setId(ownerId);
-                        newCustomer.setName("Customer " + ownerId);
-                        return customerRepository.save(newCustomer);
-                    });
-        }
-
-        Repair repair = new Repair();
-        repair.setSurfboardId(message.getSurfboardId());
-        repair.setIssue(message.getIssue());
-        repair.setStatus(RepairStatus.CREATED);
-        repair.setCustomerId(message.getCustomerId());
-        repair.setRentalId(message.getRentalId());  
-        repair.setCreatedAt(LocalDateTime.now());
-        repairRepository.save(repair);
-        System.out.println("Automatic repair created with ID: " + repair.getId());
     }
 
 }

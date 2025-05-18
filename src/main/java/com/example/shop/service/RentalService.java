@@ -18,8 +18,6 @@ import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

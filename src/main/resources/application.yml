@@ -14,24 +14,14 @@ spring:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate.default_schema: public
 
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    publisher-confirm-type: correlated
-    publisher-returns: true
-
 server:
+  address: 0.0.0.0
   port: 8080
   
 logging:
   level:
     root: DEBUG
-    org.springframework: DEBUG
-    org.springframework.amqp: DEBUG
-    org.springframework.amqp.rabbit: DEBUG
- 
+    org.springframework: DEBUG 
 
 
 cors:
