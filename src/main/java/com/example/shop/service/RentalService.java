@@ -25,7 +25,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -132,7 +134,8 @@ public class RentalService {
     public void returnBoard(UUID rentalId,
                             boolean isDamaged,
                             String damageDescription,
-                            Double repairPrice) {
+                            Double repairPrice,
+                            Double finalFeeOverride) {
         // 1) Load & update Rental
         Rental rental = rentalRepository.findById(rentalId)
             .orElseThrow(() -> new RuntimeException("Rental not found: " + rentalId));
@@ -147,39 +150,45 @@ public class RentalService {
         board.setAvailable(!isDamaged);
         surfboardRepository.save(board);
 
-        // 3) Always create a Bill
-        double rentalFee = rental.getRentalFee() != null ? rental.getRentalFee() : 15.0;
-        double feeToBill = isDamaged
-            ? repairPrice != null ? repairPrice : 0.0
-            : rentalFee;
+       // 3) Figure out the total rental‐only fee
+    LocalDate start = rental.getRentedAt().toLocalDate();
+    LocalDate end   = LocalDateTime.now().toLocalDate();
+    long days = ChronoUnit.DAYS.between(start, end) + 1;          // inclusive
+    double dailyRate = Optional.ofNullable(rental.getRentalFee())
+                               .orElse(15.0);                     // your default
+    double rentalTotal = finalFeeOverride != null
+                         ? finalFeeOverride
+                         : days * dailyRate;
 
-        Bill bill = new Bill();
-        bill.setCustomerId(rental.getCustomerId());
-        bill.setRentalId(isDamaged ? null : rentalId);
-        bill.setRepairId(isDamaged ? null : null); // set below if needed
-        bill.setRentalFee(isDamaged ? 0.0 : rentalFee);
-        bill.setRepairFee(isDamaged ? feeToBill : 0.0);
-        bill.setTotalAmount(feeToBill);
-        bill.setCreatedAt(LocalDateTime.now());
-        bill.setStatus(BillStatus.COMPLETED);
-        bill.setDescription(isDamaged
-            ? String.format("Repair fee for board %s, rental %s", board.getId(), rentalId)
-            : String.format("Rental fee for rental %s", rentalId));
-        billingRepository.save(bill);
+    // 4) Create the bill
+    Bill bill = new Bill();
+    bill.setCustomerId(rental.getCustomerId());
+    bill.setRentalId(isDamaged ? null : rentalId);
+    bill.setRepairId(isDamaged ? null : null); // set below if needed
+    bill.setRepairFee(isDamaged ? repairPrice : 0.0);
+    bill.setRentalFee(rentalTotal);
+    bill.setTotalAmount(isDamaged
+                        ? (repairPrice != null ? repairPrice : 0.0)
+                        : rentalTotal);
+    bill.setCreatedAt(LocalDateTime.now());
+    bill.setStatus(BillStatus.COMPLETED);
+    bill.setDescription(isDamaged
+        ? String.format("Repair fee for board %s, rental %s", board.getId(), rentalId)
+        : String.format("Rental fee for %d days (rental %s)", days, rentalId));
+    billingRepository.save(bill);
 
-        // 4) If damaged, also create a Repair record
-        if (isDamaged) {
-            Repair repair = new Repair();
-            repair.setSurfboardId(board.getId());
-            repair.setCustomerId(rental.getCustomerId());
-            repair.setRentalId(rentalId);
-            repair.setIssue(damageDescription);
-            repair.setRepairFee(feeToBill);
-            repair.setStatus(RepairStatus.CREATED);
-            repair.setCreatedAt(LocalDateTime.now());
-            repairRepository.save(repair);
-        }
-
+ // 5) If damaged, also spawn a Repair (same as before) …
+ if (isDamaged) {
+    Repair rep = new Repair();
+    rep.setSurfboardId(board.getId());
+    rep.setCustomerId(rental.getCustomerId());
+    rep.setRentalId(rentalId);
+    rep.setIssue(damageDescription);
+    rep.setRepairFee(repairPrice != null ? repairPrice : 0.0);
+    rep.setStatus(RepairStatus.CREATED);
+    rep.setCreatedAt(LocalDateTime.now());
+    repairRepository.save(rep);
+ }
         System.out.println("🔄 returnBoard complete: rental=" + rentalId +
                            ", damaged=" + isDamaged);
     }

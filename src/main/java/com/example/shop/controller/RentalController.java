@@ -33,17 +33,17 @@ public class RentalController {
         return "Rental requested!";
     }
 
-    // Return rented board
-   @PostMapping("/{id}/return")
+    @PostMapping("/{id}/return")
     public ResponseEntity<Void> returnBoard(
-        @PathVariable UUID id,
-        @RequestBody ReturnRequest req
+            @PathVariable UUID id,
+            @RequestBody ReturnRequest req       
     ) {
         rentalService.returnBoard(
             id,
             req.isDamaged(),
             req.getDamageDescription(),
-            req.getRepairPrice()
+            req.getRepairPrice(),
+            req.getFinalFee()                   
         );
         return ResponseEntity.ok().build();
     }

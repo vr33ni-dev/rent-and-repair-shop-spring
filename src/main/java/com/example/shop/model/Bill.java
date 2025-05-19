@@ -31,7 +31,7 @@ public class Bill {
 
     private Double totalAmount;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime paidAt;
 
     public UUID getId() {
         return id;
@@ -105,14 +105,14 @@ public class Bill {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
     public String getDescription() {
         return description;
     }

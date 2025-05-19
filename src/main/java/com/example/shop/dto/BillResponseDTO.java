@@ -3,12 +3,15 @@ package com.example.shop.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+ 
 import com.example.shop.enums.BillStatus;
  
 public class BillResponseDTO {
     private UUID id;
     private UUID customerId;
     private String customerName;
+    private String customerContact;  
+    private String customerContactType;
     private UUID rentalId;
     private UUID repairId;
     private double rentalFee;
@@ -16,18 +19,21 @@ public class BillResponseDTO {
     private double totalAmount;
     private BillStatus status;
     private LocalDateTime billCreatedAt;
+    private LocalDateTime billPaidAt;
     private LocalDateTime rentalDate;
     private LocalDateTime repairDate;
     private String description;
 
-    public BillResponseDTO(UUID id, UUID customerId, String customerName, String description,
+    public BillResponseDTO(UUID id, UUID customerId, String customerName, String customerContact, String customerContactType, String description,
     UUID rentalId, UUID repairId,
             double rentalFee, double repairFee, double totalAmount,
-            BillStatus status, LocalDateTime billCreatedAt,
+            BillStatus status, LocalDateTime billCreatedAt, LocalDateTime billPaidAt,
             LocalDateTime rentalDate, LocalDateTime repairDate) {
         this.id = id;
         this.customerId = customerId;
         this.customerName = customerName;
+        this.customerContact = customerContact;
+        this.customerContactType = customerContactType;
         this.description = description;
         this.rentalId = rentalId;
         this.repairId = repairId;
@@ -36,6 +42,7 @@ public class BillResponseDTO {
         this.totalAmount = totalAmount;
         this.status = status;
         this.billCreatedAt = billCreatedAt;
+        this.billPaidAt = billPaidAt;
         this.rentalDate = rentalDate;
         this.repairDate = repairDate;
     }
@@ -65,6 +72,18 @@ public class BillResponseDTO {
         this.customerName = customerName;
     }
 
+    public String getCustomerContact() {
+        return customerContact;
+    }
+    public void setCustomerContact(String customerContact) {
+        this.customerContact = customerContact;
+    }
+    public String getCustomerContactType() {
+        return customerContactType;
+    }
+    public void setCustomerContactType(String customerContactType) {
+        this.customerContactType = customerContactType;
+    }
     public String getDescription() {
         return description;
     }
@@ -81,6 +100,12 @@ public class BillResponseDTO {
         this.billCreatedAt = billCreatedAt;
     }
 
+    public LocalDateTime getBillPaidAt() {
+        return billPaidAt;
+    }
+    public void setBillPaidAt(LocalDateTime billPaidAt) {
+        this.billPaidAt = billPaidAt;
+    }
     public LocalDateTime getRentalDate() {
         return rentalDate;
     }

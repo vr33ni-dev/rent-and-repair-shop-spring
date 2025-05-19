@@ -81,6 +81,7 @@ public class SeedData implements ApplicationListener<ContextRefreshedEvent> {
             repair1.setIssue("Cracked fin");
             repair1.setStatus(RepairStatus.CREATED);
             repair1.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
+            repair1.setRepairFee(20.0);
             repairRepo.save(repair1);
     
             Repair repair2 = new Repair();
@@ -89,6 +90,7 @@ public class SeedData implements ApplicationListener<ContextRefreshedEvent> {
             repair2.setIssue("Tail damage");
             repair2.setStatus(RepairStatus.CREATED);
             repair2.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
+            repair2.setRepairFee(15.0);
             repairRepo.save(repair2);
     
             Repair repair3 = new Repair();
@@ -97,6 +99,7 @@ public class SeedData implements ApplicationListener<ContextRefreshedEvent> {
             repair3.setIssue("Tail damage");
             repair3.setStatus(RepairStatus.CREATED);
             repair3.setCreatedAt(LocalDateTime.now().minusDays(1)); // required
+            repair3.setRepairFee(15.0);
             repairRepo.save(repair3);
     
             System.out.println("🌱 Seed data loaded successfully");

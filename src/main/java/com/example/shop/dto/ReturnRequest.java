@@ -14,6 +14,7 @@ public class ReturnRequest {
 
     private String damageDescription;
     private Double repairPrice;
+    private Double finalFee;
 
     public ReturnRequest() { }
 
@@ -39,5 +40,11 @@ public class ReturnRequest {
 
     public void setRepairPrice(Double repairPrice) {
         this.repairPrice = repairPrice;
+    }
+    public Double getFinalFee() {
+        return finalFee;
+    }
+    public void setFinalFee(Double finalFee) {
+        this.finalFee = finalFee;
     }
 }

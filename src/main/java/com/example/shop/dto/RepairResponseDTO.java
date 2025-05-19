@@ -17,9 +17,10 @@ public class RepairResponseDTO {
     private String issue;
     private RepairStatus status;
     private LocalDateTime createdAt;
+    private Double repairFee;
 
      public RepairResponseDTO(UUID repairId, UUID surfboardId, UUID customerId, UUID rentalId, String surfboardName, 
-            String issue, RepairStatus status, LocalDateTime createdAt, String customerName) {
+            String issue, RepairStatus status, LocalDateTime createdAt, String customerName, Double repairFee) {
         this.repairId = repairId;
         this.surfboardId = surfboardId;
         this.customerId = customerId;
@@ -29,6 +30,7 @@ public class RepairResponseDTO {
         this.issue = issue;
         this.status = status;
         this.createdAt = createdAt;
+        this.repairFee = repairFee;
     }
 
     public UUID getRepairId() {
@@ -92,5 +94,11 @@ public class RepairResponseDTO {
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public Double getRepairFee() {
+        return repairFee;
+    }
+    public void setRepairFee(Double repairFee) {
+        this.repairFee = repairFee;
     }
 }

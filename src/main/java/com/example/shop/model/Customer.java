@@ -4,8 +4,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
@@ -39,6 +38,20 @@ public class Customer {
     public void setName(String name) {
         this.name = name;
     }
+    public String getContact() {
+        return email != null ? email : phone;
+    }
+    public void setContact(String contact) {
+        if (contact.contains("@")) {
+            this.email = contact;
+        } else {
+            this.phone = contact;
+        }
+    }
+    public String getContactType() {
+        return email != null ? "email" : "phone";
+    }
+
     public String getEmail() {
         return email;
     }

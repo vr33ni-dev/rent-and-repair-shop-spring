@@ -71,7 +71,9 @@ public class RepairService {
                     repair.getIssue(),
                     repair.getStatus(),
                     repair.getCreatedAt(),
-                    customerName);
+                    customerName,
+                    repair.getRepairFee()
+                    );
         }).collect(Collectors.toList());
     }
 
@@ -128,6 +130,7 @@ public class RepairService {
         repair.setCustomerId(customer.getId());
         repair.setIssue(request.getIssue());
         repair.setStatus(RepairStatus.CREATED);
+        repair.setRepairFee(request.getRepairFee());
         repair.setCreatedAt(LocalDateTime.now());  
         repairRepository.save(repair);
         System.out.println("Manual repair created with ID: " + repair.getId());
