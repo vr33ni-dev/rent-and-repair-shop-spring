@@ -1,7 +1,13 @@
 package com.example.shop.controller;
 
+import com.example.shop.dto.SurfboardRequest;
+import com.example.shop.dto.SurfboardResponseDTO;
 import com.example.shop.model.Surfboard;
 import com.example.shop.repository.SurfboardRepository;
+import com.example.shop.service.InventoryService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,8 +17,11 @@ import java.util.List;
 public class SurfboardController {
 
     private final SurfboardRepository surfboardRepository;
+    private final InventoryService inventoryService;
 
-    public SurfboardController(SurfboardRepository surfboardRepository) {
+
+    public SurfboardController(InventoryService inventoryService, SurfboardRepository surfboardRepository) {
+        this.inventoryService = inventoryService;
         this.surfboardRepository = surfboardRepository;
     }
 
@@ -27,6 +36,13 @@ public class SurfboardController {
                 .stream()
                 .filter(Surfboard::isAvailableForRental)
                 .toList();
+    }
+
+    @PostMapping
+    public ResponseEntity<SurfboardResponseDTO> addBoard(
+            @Validated @RequestBody SurfboardRequest request) {
+        SurfboardResponseDTO dto = inventoryService.createSurfboard(request);
+        return ResponseEntity.ok(dto);
     }
 
 }

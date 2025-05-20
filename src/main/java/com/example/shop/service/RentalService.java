@@ -1,6 +1,6 @@
 package com.example.shop.service;
 
- import com.example.shop.dto.RentalMessage;
+import com.example.shop.dto.RentalMessage;
 import com.example.shop.dto.RepairMessage;
 import com.example.shop.enums.BillStatus;
 import com.example.shop.enums.RentalStatus;
@@ -43,7 +43,7 @@ public class RentalService {
 
     public RentalService(RentalRepository rentalRepository, SurfboardRepository surfboardRepository,
             CustomerRepository customerRepository, BillingRepository billingRepository,
-           RepairRepository repairRepository) {
+            RepairRepository repairRepository) {
         this.rentalRepository = rentalRepository;
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
@@ -124,72 +124,80 @@ public class RentalService {
         rental.setRentalFee(request.getRentalFee() != null ? request.getRentalFee() : 15.0);
         rental.setRentedAt(LocalDateTime.now());
         rental.setStatus(RentalStatus.CREATED);
-         rentalRepository.save(rental);
+        rentalRepository.save(rental);
 
-      
         System.out.println("✅ Rental created and board marked unavailable: " + rental.getId());
     }
- 
+
     @Transactional
     public void returnBoard(UUID rentalId,
-                            boolean isDamaged,
-                            String damageDescription,
-                            Double repairPrice,
-                            Double finalFeeOverride) {
+            boolean isDamaged,
+            String damageDescription,
+            Double repairPrice,
+            Double finalFeeOverride) {
         // 1) Load & update Rental
         Rental rental = rentalRepository.findById(rentalId)
-            .orElseThrow(() -> new RuntimeException("Rental not found: " + rentalId));
+                .orElseThrow(() -> new RuntimeException("Rental not found: " + rentalId));
         rental.setReturnedAt(LocalDateTime.now());
         rental.setStatus(RentalStatus.RETURNED);
         rentalRepository.save(rental);
 
         // 2) Load & update Surfboard
         Surfboard board = surfboardRepository.findById(rental.getSurfboardId())
-            .orElseThrow(() -> new IllegalStateException("Board not found: " + rental.getSurfboardId()));
+                .orElseThrow(() -> new IllegalStateException("Board not found: " + rental.getSurfboardId()));
         board.setDamaged(isDamaged);
         board.setAvailable(!isDamaged);
         surfboardRepository.save(board);
 
-       // 3) Figure out the total rental‐only fee
-    LocalDate start = rental.getRentedAt().toLocalDate();
-    LocalDate end   = LocalDateTime.now().toLocalDate();
-    long days = ChronoUnit.DAYS.between(start, end) + 1;          // inclusive
-    double dailyRate = Optional.ofNullable(rental.getRentalFee())
-                               .orElse(15.0);                     // your default
-    double rentalTotal = finalFeeOverride != null
-                         ? finalFeeOverride
-                         : days * dailyRate;
+        // 3) Figure out the total rental‐only fee
+        LocalDate start = rental.getRentedAt().toLocalDate();
+        LocalDate end = LocalDateTime.now().toLocalDate();
+        long days = ChronoUnit.DAYS.between(start, end) + 1; // inclusive
+        double dailyRate = Optional.ofNullable(rental.getRentalFee())
+                .orElse(15.0); // your default
+        double rentalTotal = finalFeeOverride != null
+                ? finalFeeOverride
+                : days * dailyRate;
 
-    // 4) Create the bill
-    Bill bill = new Bill();
-    bill.setCustomerId(rental.getCustomerId());
-    bill.setRentalId(isDamaged ? null : rentalId);
-    bill.setRepairId(isDamaged ? null : null); // set below if needed
-    bill.setRepairFee(isDamaged ? repairPrice : 0.0);
-    bill.setRentalFee(rentalTotal);
-    bill.setTotalAmount(isDamaged
-                        ? (repairPrice != null ? repairPrice : 0.0)
-                        : rentalTotal);
-    bill.setCreatedAt(LocalDateTime.now());
-    bill.setStatus(BillStatus.COMPLETED);
-    bill.setDescription(isDamaged
-        ? String.format("Repair fee for board %s, rental %s", board.getId(), rentalId)
-        : String.format("Rental fee for %d days (rental %s)", days, rentalId));
-    billingRepository.save(bill);
+        // 4) Create a repair, if necessary
+        Repair createdRepair = null;
+        if (isDamaged) {
+            Repair rep = new Repair();
+            rep.setSurfboardId(board.getId());
+            rep.setCustomerId(rental.getCustomerId());
+            rep.setRentalId(rentalId);
+            rep.setIssue(damageDescription);
+            rep.setRepairFee(repairPrice != null ? repairPrice : 15.0);
+            rep.setStatus(RepairStatus.CREATED);
+            rep.setCreatedAt(LocalDateTime.now());
+            createdRepair = repairRepository.save(rep);
+        }
 
- // 5) If damaged, also spawn a Repair (same as before) …
- if (isDamaged) {
-    Repair rep = new Repair();
-    rep.setSurfboardId(board.getId());
-    rep.setCustomerId(rental.getCustomerId());
-    rep.setRentalId(rentalId);
-    rep.setIssue(damageDescription);
-    rep.setRepairFee(repairPrice != null ? repairPrice : 0.0);
-    rep.setStatus(RepairStatus.CREATED);
-    rep.setCreatedAt(LocalDateTime.now());
-    repairRepository.save(rep);
- }
+        // 5) now build the Bill, linking to either the rental or the repair:
+        Bill bill = new Bill();
+        bill.setCustomerId(rental.getCustomerId());
+        if (createdRepair != null) {
+            // link this bill to the repair
+            bill.setRepairId(createdRepair.getId());
+            bill.setRentalId(rentalId);
+        } else {
+            // no damage: just a rental bill
+            bill.setRentalId(rentalId);
+        }
+        bill.setRepairFee(isDamaged ? createdRepair.getRepairFee() : 15.0);
+        bill.setRentalFee(rentalTotal);
+        bill.setTotalAmount(isDamaged
+                ? (createdRepair.getRepairFee() != null ? createdRepair.getRepairFee() : 15.0)
+                : rentalTotal);
+        bill.setCreatedAt(LocalDateTime.now());
+        bill.setStatus(BillStatus.COMPLETED);
+        bill.setDescription(isDamaged
+                ? String.format("Repair fee for board %s (rental %s)", board.getId(), rentalId)
+                : String.format("Rental fee for %d days (rental %s)", days, rentalId));
+        billingRepository.save(bill);
+
         System.out.println("🔄 returnBoard complete: rental=" + rentalId +
-                           ", damaged=" + isDamaged);
+                ", damaged=" + isDamaged +
+                (createdRepair != null ? ", repair=" + createdRepair.getId() : ""));
     }
 }

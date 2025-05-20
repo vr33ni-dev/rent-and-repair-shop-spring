@@ -14,16 +14,22 @@ public class Surfboard {
     private UUID id;
 
     private String name;
+
+    @Column(columnDefinition = "TEXT") // optional, allow longer descriptions
+    private String description;
+
     private boolean available;
     private boolean damaged;
     private boolean shopOwned;
     private String imageUrl;
-  
+
     private UUID ownerId; // nullable if shop-owned
 
-    public Surfboard() {}
+    public Surfboard() {
+    }
 
-    public Surfboard(String name, boolean available, boolean damaged, boolean shopOwned, UUID ownerId, String imageUrl) {
+    public Surfboard(String name, boolean available, boolean damaged, boolean shopOwned, UUID ownerId,
+            String imageUrl) {
         this.name = name;
         this.available = available;
         this.damaged = damaged;
@@ -46,6 +52,14 @@ public class Surfboard {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public boolean isAvailable() {
@@ -87,14 +101,17 @@ public class Surfboard {
     public UUID getOwnerId() {
         return ownerId;
     }
+
     public void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Surfboard)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Surfboard))
+            return false;
         Surfboard that = (Surfboard) o;
         return Objects.equals(id, that.id);
     }
