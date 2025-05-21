@@ -16,26 +16,20 @@ import java.util.List;
 @RequestMapping("/api/surfboards")
 public class SurfboardController {
 
-    private final SurfboardRepository surfboardRepository;
     private final InventoryService inventoryService;
 
-
-    public SurfboardController(InventoryService inventoryService, SurfboardRepository surfboardRepository) {
+    public SurfboardController(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
-        this.surfboardRepository = surfboardRepository;
     }
 
     @GetMapping("/all")
-    public List<Surfboard> getAllSurfboards() {
-        return surfboardRepository.findAll();
+    public List<SurfboardResponseDTO> all() {
+        return inventoryService.getAllBoards();
     }
 
     @GetMapping("/available")
-    public List<Surfboard> getAvailableBoards() {
-        return surfboardRepository.findAll()
-                .stream()
-                .filter(Surfboard::isAvailableForRental)
-                .toList();
+    public List<SurfboardResponseDTO> available() {
+        return inventoryService.getAvailableBoards();
     }
 
     @PostMapping

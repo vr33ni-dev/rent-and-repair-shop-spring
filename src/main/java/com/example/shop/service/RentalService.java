@@ -187,7 +187,7 @@ public class RentalService {
         bill.setRepairFee(isDamaged ? createdRepair.getRepairFee() : 15.0);
         bill.setRentalFee(rentalTotal);
         bill.setTotalAmount(isDamaged
-                ? (createdRepair.getRepairFee() != null ? createdRepair.getRepairFee() : 15.0)
+                ? (repairPrice != null ? repairPrice : 15.0)
                 : rentalTotal);
         bill.setCreatedAt(LocalDateTime.now());
         bill.setStatus(BillStatus.COMPLETED);

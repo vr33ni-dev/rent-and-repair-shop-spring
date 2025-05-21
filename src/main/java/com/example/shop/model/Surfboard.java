@@ -18,6 +18,9 @@ public class Surfboard {
     @Column(columnDefinition = "TEXT") // optional, allow longer descriptions
     private String description;
 
+    private String sizeText;   // e.g. "6\"0" or "6.0"
+    private Double size;       // parsed inches, e.g. 6.0
+
     private boolean available;
     private boolean damaged;
     private boolean shopOwned;
@@ -28,16 +31,7 @@ public class Surfboard {
     public Surfboard() {
     }
 
-    public Surfboard(String name, boolean available, boolean damaged, boolean shopOwned, UUID ownerId,
-            String imageUrl) {
-        this.name = name;
-        this.available = available;
-        this.damaged = damaged;
-        this.shopOwned = shopOwned;
-        this.ownerId = ownerId;
-        this.imageUrl = imageUrl;
-    }
-
+ 
     public UUID getId() {
         return id;
     }
@@ -62,6 +56,16 @@ public class Surfboard {
         this.description = description;
     }
 
+
+    public String getSizeText() { return sizeText; }
+    public void setSizeText(String sizeText) { this.sizeText = sizeText; }
+
+    public Double getSize() {
+        return size;
+    }
+    public void setSize(Double size) {
+        this.size = size;
+    }
     public boolean isAvailable() {
         return available;
     }
