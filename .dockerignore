@@ -1,0 +1,22 @@
+# Maven build output
+target/
+
+# Git
+.git
+.gitignore
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env files (never copy secrets into image!)
+.env
+.env.local
