@@ -1,7 +1,5 @@
 package com.example.shop.service;
 
-import com.example.shop.dto.RentalMessage;
-import com.example.shop.dto.RepairMessage;
 import com.example.shop.enums.BillStatus;
 import com.example.shop.enums.RentalStatus;
 import com.example.shop.enums.RepairStatus;
@@ -18,12 +16,8 @@ import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,15 +34,17 @@ public class RentalService {
     private final SurfboardRepository surfboardRepository;
     private final CustomerRepository customerRepository;
     private final BillingRepository billingRepository;
+    private final SettingsService settingsService;
 
     public RentalService(RentalRepository rentalRepository, SurfboardRepository surfboardRepository,
             CustomerRepository customerRepository, BillingRepository billingRepository,
-            RepairRepository repairRepository) {
+            RepairRepository repairRepository, SettingsService settingsService) {
         this.rentalRepository = rentalRepository;
         this.surfboardRepository = surfboardRepository;
         this.customerRepository = customerRepository;
         this.billingRepository = billingRepository;
         this.repairRepository = repairRepository;
+        this.settingsService = settingsService;
     }
 
     public List<RentalResponseDTO> getAllRentalDTOs() {
@@ -121,7 +117,10 @@ public class RentalService {
         Rental rental = new Rental();
         rental.setCustomerId(customer.getId());
         rental.setSurfboardId(board.getId());
-        rental.setRentalFee(request.getRentalFee() != null ? request.getRentalFee() : 15.0);
+        rental.setRentalFee(
+                request.getRentalFee() != null
+                        ? request.getRentalFee()
+                        : settingsService.getDefaultRentalFee());
         rental.setRentedAt(LocalDateTime.now());
         rental.setStatus(RentalStatus.CREATED);
         rentalRepository.save(rental);
