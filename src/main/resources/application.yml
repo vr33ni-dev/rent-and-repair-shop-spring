@@ -24,14 +24,18 @@ spring:
 server:
   address: 0.0.0.0
   port: 8080
-  
+
 logging:
   level:
     root: DEBUG
-    org.springframework: DEBUG 
+    org.springframework: DEBUG
     org.flywaydb: DEBUG
-
-
 
 cors:
   allowed-origin: ${CORS_ALLOWED_ORIGIN:*}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

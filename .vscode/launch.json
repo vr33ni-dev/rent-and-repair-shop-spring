@@ -1,14 +1,17 @@
 {
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Spring Boot-RentAndAndRepairShopApplication<rent-and-repair-shop>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.example.shop.RentAndAndRepairShopApplication",
-            "projectName": "rent-and-repair-shop",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        }
-    ]
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-RentAndAndRepairShopApplication<rent-and-repair-shop>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.shop.RentAndAndRepairShopApplication",
+      "projectName": "rent-and-repair-shop",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "dev"
+      }
+    }
+  ]
 }
