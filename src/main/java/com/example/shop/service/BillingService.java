@@ -60,6 +60,12 @@ public class BillingService {
                                                         .orElse(null)
                                         : null;
 
+                        LocalDateTime rentalReturnDate = bill.getRentalId() != null
+                                        ? rentalRepository.findById(bill.getRentalId())
+                                                        .map(Rental::getReturnedAt)
+                                                        .orElse(null)
+                                        : null;
+
                         LocalDateTime repairDate = bill.getRepairId() != null
                                         ? repairRepository.findById(bill.getRepairId())
                                                         .map(Repair::getCreatedAt)
@@ -82,6 +88,7 @@ public class BillingService {
                                         bill.getCreatedAt(),
                                         bill.getPaidAt(),
                                         rentalDate,
+                                        rentalReturnDate,
                                         repairDate);
                 }).collect(Collectors.toList());
         }

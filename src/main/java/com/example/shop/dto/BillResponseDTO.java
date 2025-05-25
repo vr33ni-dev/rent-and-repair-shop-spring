@@ -21,6 +21,7 @@ public class BillResponseDTO {
     private LocalDateTime billCreatedAt;
     private LocalDateTime billPaidAt;
     private LocalDateTime rentalDate;
+    private LocalDateTime rentalReturnDate;
     private LocalDateTime repairDate;
     private String description;
 
@@ -28,7 +29,7 @@ public class BillResponseDTO {
     UUID rentalId, UUID repairId,
             double rentalFee, double repairFee, double totalAmount,
             BillStatus status, LocalDateTime billCreatedAt, LocalDateTime billPaidAt,
-            LocalDateTime rentalDate, LocalDateTime repairDate) {
+            LocalDateTime rentalDate, LocalDateTime rentalReturnDate, LocalDateTime repairDate) {
         this.id = id;
         this.customerId = customerId;
         this.customerName = customerName;
@@ -44,6 +45,7 @@ public class BillResponseDTO {
         this.billCreatedAt = billCreatedAt;
         this.billPaidAt = billPaidAt;
         this.rentalDate = rentalDate;
+        this.rentalReturnDate = rentalReturnDate;
         this.repairDate = repairDate;
     }
 
@@ -112,6 +114,12 @@ public class BillResponseDTO {
 
     public void setRentalDate(LocalDateTime rentalDate) {
         this.rentalDate = rentalDate;
+    }
+    public LocalDateTime getRentalReturnDate() {
+        return rentalReturnDate;
+    }
+    public void setRentalReturnDate(LocalDateTime rentalReturnDate) {
+        this.rentalReturnDate = rentalReturnDate;
     }
 
     public LocalDateTime getRepairDate() {

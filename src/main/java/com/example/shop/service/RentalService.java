@@ -183,7 +183,7 @@ public class RentalService {
             // no damage: just a rental bill
             bill.setRentalId(rentalId);
         }
-        bill.setRepairFee(isDamaged ? createdRepair.getRepairFee() : 15.0);
+        bill.setRepairFee(isDamaged ? createdRepair.getRepairFee() : 0.0);
         bill.setRentalFee(rentalTotal);
         bill.setTotalAmount(isDamaged
                 ? (repairPrice != null ? repairPrice : 15.0)
