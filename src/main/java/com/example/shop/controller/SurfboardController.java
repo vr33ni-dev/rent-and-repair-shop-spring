@@ -11,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/surfboards")
@@ -37,6 +39,23 @@ public class SurfboardController {
             @Validated @RequestBody SurfboardRequest request) {
         SurfboardResponseDTO dto = inventoryService.createSurfboard(request);
         return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{id}/image")
+    public ResponseEntity<?> updateBoardImage(
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> payload) {
+        String imageUrl = payload.get("imageUrl");
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().body("Missing imageUrl");
+        }
+
+        boolean updated = inventoryService.updateImageUrl(id, imageUrl);
+        if (updated) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

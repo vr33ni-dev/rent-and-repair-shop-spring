@@ -28,7 +28,7 @@ public class SurfboardResponseDTO {
         this.shopOwned = shopOwned;
         this.imageUrl = imageUrl;
         this.ownerId = ownerId;
-    }
+     }
 
     // getters only
     public UUID getId() {

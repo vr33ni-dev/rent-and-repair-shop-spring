@@ -11,6 +11,7 @@ import com.example.shop.repository.SurfboardRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -51,6 +52,7 @@ public class InventoryService {
         board.setShopOwned(true);
         board.setDamaged(req.isDamaged());
         board.setAvailable(!req.isDamaged()); // available only if not damaged
+        board.setImageUrl(req.getImageUrl().isBlank() ? "" : req.getImageUrl());
         board = surfboardRepository.save(board);
 
         // 2) If it’s damaged, open a “Repair” for it right away
@@ -68,6 +70,14 @@ public class InventoryService {
                 board.getId(), board.getName(), board.getDescription(),
                 board.getSize(), board.getSizeText(),
                 board.isAvailable(), board.isDamaged(), board.isShopOwned(), board.getImageUrl(), board.getOwnerId());
+    }
+
+    public boolean updateImageUrl(UUID id, String imageUrl) {
+        return surfboardRepository.findById(id).map(board -> {
+            board.setImageUrl(imageUrl);
+            surfboardRepository.save(board);
+            return true;
+        }).orElse(false);
     }
 
     /**
