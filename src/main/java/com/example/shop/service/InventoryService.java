@@ -72,6 +72,14 @@ public class InventoryService {
                 board.isAvailable(), board.isDamaged(), board.isShopOwned(), board.getImageUrl(), board.getOwnerId());
     }
 
+     public boolean deleteSurfboard(UUID id) {
+        if (!surfboardRepository.existsById(id)) {
+            return false;
+        }
+        surfboardRepository.deleteById(id);
+        return true;
+    }
+
     public boolean updateImageUrl(UUID id, String imageUrl) {
         return surfboardRepository.findById(id).map(board -> {
             board.setImageUrl(imageUrl);

@@ -58,4 +58,14 @@ public class SurfboardController {
         }
     }
 
+        @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBoard(@PathVariable UUID id) {
+        boolean deleted = inventoryService.deleteSurfboard(id);
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
