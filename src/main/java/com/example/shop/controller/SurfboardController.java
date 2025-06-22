@@ -2,8 +2,6 @@ package com.example.shop.controller;
 
 import com.example.shop.dto.SurfboardRequest;
 import com.example.shop.dto.SurfboardResponseDTO;
-import com.example.shop.model.Surfboard;
-import com.example.shop.repository.SurfboardRepository;
 import com.example.shop.service.InventoryService;
 
 import org.springframework.http.ResponseEntity;

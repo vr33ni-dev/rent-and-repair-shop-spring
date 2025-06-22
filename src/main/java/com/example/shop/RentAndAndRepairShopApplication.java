@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -22,6 +23,7 @@ public class RentAndAndRepairShopApplication {
         System.out.println("🔍 JDBC URL: " + env.getProperty("spring.datasource.url"));
     }
 
+    @Profile("dev")
     @Bean
     public CommandLineRunner init(EntityManager entityManager) {
         return args -> {
@@ -31,8 +33,4 @@ public class RentAndAndRepairShopApplication {
         };
     }
 
-    
-
 }
-
-

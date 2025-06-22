@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-@Profile("!dev")
+@Profile("keepalive")
 @Component
 public class SelfPingTask {
 
