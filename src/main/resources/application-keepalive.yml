@@ -4,8 +4,8 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
-  flyway:
-    enabled: false
+flyway:
+  enabled: false
 
 management:
   health:
