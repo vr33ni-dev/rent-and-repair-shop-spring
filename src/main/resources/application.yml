@@ -6,14 +6,14 @@ server:
   address: 0.0.0.0
   port: 8080
 
+cors:
+  allowed-origin: ${CORS_ALLOWED_ORIGIN:*}
+
 logging:
   level:
     root: DEBUG
     org.springframework: DEBUG
     org.flywaydb: DEBUG
-
-cors:
-  allowed-origin: ${CORS_ALLOWED_ORIGIN:*}
 
 management:
   endpoints:
@@ -61,35 +61,12 @@ management:
 spring:
   config:
     activate:
-      on-profile: keepalive
-
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-
-  flyway:
-    enabled: false
-
-management:
-  health:
-    db:
-      enabled: false
-
-
----
-
-spring:
-  config:
-    activate:
       on-profile: dev
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:5432/surfshop}
     username: ${SPRING_DATASOURCE_USERNAME:user}
     password: ${SPRING_DATASOURCE_PASSWORD:pass}
-
-
 
   jpa:
     hibernate:
