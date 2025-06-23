@@ -2,11 +2,13 @@ package com.example.shop.service;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.example.shop.model.Setting;
 import com.example.shop.repository.SettingsRepository;
 
+@Profile("!keepalive")
 @Service
 public class SettingsService {
     private final SettingsRepository repo;

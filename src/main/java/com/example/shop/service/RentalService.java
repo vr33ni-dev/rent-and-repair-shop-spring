@@ -16,6 +16,7 @@ import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Profile("!keepalive")
 @Service
 public class RentalService {
 
