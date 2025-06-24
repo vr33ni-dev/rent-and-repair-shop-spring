@@ -11,7 +11,6 @@ import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,8 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 
-@Service
-public class BillingService {
+ public class BillingService {
 
         private final BillingRepository billingRepository;
         private final CustomerRepository customerRepository;

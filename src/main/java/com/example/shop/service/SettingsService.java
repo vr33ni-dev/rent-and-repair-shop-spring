@@ -2,13 +2,11 @@ package com.example.shop.service;
 
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
-
+ 
 import com.example.shop.model.Setting;
 import com.example.shop.repository.SettingsRepository;
 
-@Service
-public class SettingsService {
+ public class SettingsService {
     private final SettingsRepository repo;
 
     public SettingsService(SettingsRepository repo) {

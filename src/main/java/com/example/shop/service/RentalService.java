@@ -16,7 +16,6 @@ import com.example.shop.repository.RentalRepository;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.repository.SurfboardRepository;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -26,8 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class RentalService {
+ public class RentalService {
 
     private final RentalRepository rentalRepository;
     private final RepairRepository repairRepository;
