@@ -4,6 +4,7 @@ import com.example.shop.dto.SurfboardRequest;
 import com.example.shop.dto.SurfboardResponseDTO;
 import com.example.shop.service.InventoryService;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Profile("!keepalive")
 @RestController
 @RequestMapping("/api/surfboards")
 public class SurfboardController {

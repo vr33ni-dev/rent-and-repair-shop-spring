@@ -5,11 +5,13 @@ import com.example.shop.model.Bill;
 import com.example.shop.repository.BillingRepository;
 import com.example.shop.service.BillingService;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+@Profile("!keepalive")
 @RestController
 @RequestMapping("/api/bills")
 public class BillingController {

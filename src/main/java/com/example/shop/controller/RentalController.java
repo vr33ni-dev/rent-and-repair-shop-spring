@@ -8,12 +8,14 @@ import com.example.shop.model.Rental;
 import com.example.shop.repository.RentalRepository;
 import com.example.shop.service.RentalService;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+@Profile("!keepalive")
 @RestController
 @RequestMapping("/api/rentals")
 public class RentalController {

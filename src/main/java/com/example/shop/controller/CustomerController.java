@@ -2,11 +2,14 @@ package com.example.shop.controller;
 
 import com.example.shop.model.Customer;
 import com.example.shop.repository.CustomerRepository;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
+@Profile("!keepalive")
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {

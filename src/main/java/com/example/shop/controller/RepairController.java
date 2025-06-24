@@ -3,6 +3,7 @@ package com.example.shop.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import com.example.shop.model.Repair;
 import com.example.shop.repository.RepairRepository;
 import com.example.shop.service.RepairService;
 
+@Profile("!keepalive")
 @RestController
 @RequestMapping("/api/repairs")
 public class RepairController {
