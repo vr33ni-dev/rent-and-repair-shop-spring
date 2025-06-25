@@ -14,6 +14,11 @@ logging:
     root: DEBUG
     org.springframework: DEBUG
     org.flywaydb: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.apache.coyote.http11.Http11Processor: ERROR
+    org.apache.tomcat.util.net.NioEndpoint: ERROR
+
 
 management:
   endpoints:
