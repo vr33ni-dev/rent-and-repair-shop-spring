@@ -17,7 +17,7 @@ public class SelfPingTask {
         "https://rent-and-repair-shop-spring.onrender.com/actuator/health"  // Pings *main app*
     );
 
-    @Scheduled(fixedDelay = 4 * 60 * 1000) // Every 4 minutes
+    @Scheduled(fixedDelay = 14 * 60 * 1000) // Every 4 minutes
     public void ping() {
         for (String url : PING_URLS) {
             try {
