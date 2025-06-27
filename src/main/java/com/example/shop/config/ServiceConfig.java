@@ -22,21 +22,43 @@ public class ServiceConfig {
         return new BillingService(billingRepository, customerRepository, repairRepository, rentalRepository);
     }
 
-    @Bean
-    public RepairService repairService(
-        RepairRepository repairRepository,
-        CustomerRepository customerRepository
-    ) {
-        return new RepairService(repairRepository, null, customerRepository, null, null);
-    }
+@Bean
+public RepairService repairService(
+    RepairRepository repairRepository,
+    SurfboardRepository surfboardRepository,
+    CustomerRepository customerRepository,
+    BillingRepository billingRepository,
+    RentalRepository rentalRepository  
+) {
+    return new RepairService(
+        repairRepository,
+        surfboardRepository,
+        customerRepository,
+        billingRepository,
+        rentalRepository
+    );
+}
 
-    @Bean
-    public RentalService rentalService(
-        RentalRepository rentalRepository,
-        CustomerRepository customerRepository
-    ) {
-        return new RentalService(rentalRepository, null, customerRepository, null, null, null);
-    }
+
+@Bean
+public RentalService rentalService(
+    RentalRepository rentalRepository,
+    SurfboardRepository surfboardRepository,
+    CustomerRepository customerRepository,
+    BillingRepository billingRepository,
+    RepairRepository repairRepository,
+    SettingsService settingsService
+) {
+    return new RentalService(
+        rentalRepository,
+        surfboardRepository,
+        customerRepository,
+        billingRepository,
+        repairRepository,
+        settingsService
+    );
+}
+
 
     @Bean
     public SettingsService settingsService(SettingsRepository settingsRepository) {
