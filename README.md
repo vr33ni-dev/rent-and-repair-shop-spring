@@ -103,47 +103,48 @@ The application uses PostgreSQL. Update the database connection details in src/m
 
 #### Billings `/api/bills`
 
-- `   GET /all`
+- `GET /all`
 
     List all bills
-- `   GET /customer/{customerId}`
+- `GET /customer/{customerId}`
 
     List bills by customer
-- `   GET /board/{surfboardId}`
+- `GET /board/{surfboardId}`
 
     List bills by surfboard
-    
+
 #### Rentals `/api/rentals`
 
-- `   POST /`
+- `POST /`
 
     Create new rental
-- `   POST /{rentalId}/return`
+- `POST /{rentalId}/return`
 
     Return rented board
-- `   GET /all`
+- `GET /all`
 
     List all rentals
-- `   GET /user/{customerId}`
+- `GET /user/{customerId}`
 
     Filter by customerId
-- `   GET /status/{status}`
+- `GET /status/{status}`
 
     Filter by status (e.g., REQUESTED, RENTED, RETURNED)
 
 #### Repairs `/api/repairs`
 
-- `   POST /`
-- `   GET /all`
-- `   GET /customer/{customerId}`
-- `   POST /{repairId}/complete`
-- `   POST /{repairId}/cancel`
+- `POST /`
+- `GET /all`
+- `GET /customer/{customerId}`
+- `POST /{repairId}/complete`
+- `POST /{repairId}/cancel`
 
 #### Surfboards `/api/surfboards`
 
-- `   GET /all`
-
+- `GET /all`
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
+
+> **Note:** The canonical repository is [**on GitHub**](https://github.com/vr33ni/rent-and-repair-shop-spring) · [Mirror on GitLab →](https://gitlab.com/vr33ni/rent-and-repair-shop-spring) [![Mirror Status](https://github.com/vr33ni/rent-and-repair-shop-spring/actions/workflows/mirror.yml/badge.svg)](https://github.com/vr33ni/rent-and-repair-shop-spring/actions/workflows/mirror.yml)
