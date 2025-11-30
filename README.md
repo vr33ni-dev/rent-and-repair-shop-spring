@@ -148,4 +148,4 @@ The application uses PostgreSQL. Update the database connection details in src/m
 This project is licensed under the MIT License.
 
 ---
-> **Note:** The canonical repository is [**on GitHub**](https://github.com/vr33ni-dev/rent-and-repair-shop-spring) · [Mirror on GitLab →](https://gitlab.com/vr33ni-personal/rent-and-repair-shop-spring) [![Mirror Status](https://github.com/vr33ni-dev/rent-and-repair-shop-spring/actions/workflows/mirror.yml/badge.svg)](https://github.com/vr33ni-dev/rent-and-repair-shop-spring/actions/workflows/mirror.yml)
+> **Note:** The canonical repository is [**on GitHub**](https://github.com/vr33ni-dev/rent-and-repair-shop-spring) · [Mirror on GitLab →](https://gitlab.com/vr33ni-personal/rent-and-repair-shop-spring) [![Mirror Status](https://github.com/vr33ni-dev/rent-and-repair-shop-spring/actions/workflows/gitlab-mirror.yml/badge.svg)](https://github.com/vr33ni-dev/rent-and-repair-shop-spring/actions/workflows/gitlab-mirror.yml)
